@@ -15,7 +15,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  //
   final _loginFormKey = GlobalKey<FormState>();
 
   @override
@@ -44,21 +43,19 @@ class _LoginPageState extends State<LoginPage> {
                           title: 'Login',
                         ),
                         CustomInputField(
-                            labelText: 'Email',
-                            hintText: 'Your email id',
-                            
-                            validator: (textValue) {
-                              if (textValue == null || textValue.isEmpty) {
-                                return 'Email is required!';
-                              }
-                              if (!EmailValidator.validate(textValue)) {
-                                return 'Please enter a valid email';
-                              }
-                              return null;
-                            }),
-                        const SizedBox(
-                          height: 16,
+                          labelText: 'Email',
+                          hintText: 'Your email id',
+                          validator: (textValue) {
+                            if (textValue == null || textValue.isEmpty) {
+                              return 'Email is required!';
+                            }
+                            if (!EmailValidator.validate(textValue)) {
+                              return 'Please enter a valid email';
+                            }
+                            return null;
+                          },
                         ),
+                        const SizedBox(height: 16),
                         CustomInputField(
                           labelText: 'Password',
                           hintText: 'Your password',
@@ -71,19 +68,19 @@ class _LoginPageState extends State<LoginPage> {
                             return null;
                           },
                         ),
-                        const SizedBox(
-                          height: 16,
-                        ),
+                        const SizedBox(height: 16),
                         Container(
                           width: size.width * 0.80,
                           alignment: Alignment.centerRight,
                           child: GestureDetector(
-                            onTap: () => {
+                            onTap: () {
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const ForgetPasswordPage()))
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ForgetPasswordPage(),
+                                ),
+                              );
                             },
                             child: const Text(
                               'Forget password?',
@@ -95,50 +92,47 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          height: 20,
-                        ),
+                        const SizedBox(height: 20),
                         CustomFormButton(
                           innerText: 'Login',
                           onPressed: _handleLoginUser,
                         ),
-                        const SizedBox(
-                          height: 18,
-                        ),
+                        const SizedBox(height: 18),
                         SizedBox(
                           width: size.width * 0.8,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Text(
-                                'Don\'t have an account ? ',
+                                'Don\'t have an account? ',
                                 style: TextStyle(
-                                    fontSize: 13,
-                                    color: Color(0xff939393),
-                                    fontWeight: FontWeight.bold),
+                                  fontSize: 13,
+                                  color: Color(0xff939393),
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               GestureDetector(
-                                onTap: () => {
+                                onTap: () {
                                   Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const SignupPage()))
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const SignupPage(),
+                                    ),
+                                  );
                                 },
                                 child: const Text(
                                   'Sign-up',
                                   style: TextStyle(
-                                      fontSize: 15,
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.bold),
+                                    fontSize: 15,
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(
-                          height: 20,
-                        ),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
@@ -152,11 +146,16 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _handleLoginUser() {
-    // login user
+    // Login user
     if (_loginFormKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Submitting data..')),
       );
+
+      // Delay navigation to the home page
+      Future.delayed(const Duration(seconds: 4), () {
+        Navigator.pushNamed(context, '/home');
+      });
     }
   }
 }

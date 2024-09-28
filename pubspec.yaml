@@ -38,6 +38,7 @@ dependencies:
   email_validator: ^3.0.0
   image_picker: ^1.1.2
   google_maps_flutter: ^2.9.0
+  curved_navigation_bar: ^1.0.6
 
 dev_dependencies:
   flutter_test:
@@ -64,7 +65,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
-    - assets/images/charging.png
+    
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

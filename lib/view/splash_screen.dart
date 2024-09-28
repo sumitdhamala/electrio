@@ -25,10 +25,10 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Add your logo here
-            Image.asset(
-              'assets/images/Screenshot.png',
-              height: 150,
-            ),
+            // Image.asset(
+            //   'assets/images/Screenshot.png',
+            //   height: 150,
+            // ),
             Icon(Icons.electric_bolt, size: 80, color: Colors.green),
             SizedBox(height: 20),
             Text(

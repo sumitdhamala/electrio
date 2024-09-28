@@ -9,7 +9,8 @@ class PageHeader extends StatelessWidget {
     return SizedBox(
         width: double.infinity,
         height: size.height * 0.3,
-        child: Image.network(
-            "https://cdni.iconscout.com/illustration/premium/thumb/charging-station-illustration-download-in-svg-png-gif-file-formats--climate-car-electric-green-pack-nature-illustrations-3851846.png"));
+        child: Image.asset(
+          "assets/images/loginpage.webp",
+        ));
   }
 }

@@ -2,8 +2,8 @@ import 'package:electrio/component/custom_form_button.dart';
 import 'package:electrio/component/custom_textfield.dart';
 import 'package:electrio/component/page_header.dart';
 import 'package:electrio/component/page_heading.dart';
-import 'package:electrio/view/forget_password.dart';
-import 'package:electrio/view/signup.dart';
+import 'package:electrio/view/signup/forget_password.dart';
+import 'package:electrio/view/signup/signup.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 
@@ -85,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
                             child: const Text(
                               'Forget password?',
                               style: TextStyle(
-                                color: Colors.green,
+                                color: Color(0xFF4CAF50),
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
                               ),

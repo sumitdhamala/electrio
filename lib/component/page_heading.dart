@@ -1,3 +1,4 @@
+import 'package:electrio/component/constants/constants.dart';
 import 'package:flutter/material.dart';
 
 class PageHeading extends StatelessWidget {
@@ -15,7 +16,7 @@ class PageHeading extends StatelessWidget {
             fontSize: 30,
             fontWeight: FontWeight.bold,
             fontFamily: 'NotoSerif',
-            color: Colors.green),
+            color: primarycolor),
       ),
     );
   }

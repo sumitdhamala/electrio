@@ -1,8 +1,9 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:electrio/view/charging_screen.dart';
-import 'package:electrio/view/screen_four.dart';
-import 'package:electrio/view/screen_one.dart';
-import 'package:electrio/view/screen_two.dart';
+import 'package:electrio/component/constants/constants.dart';
+import 'package:electrio/view/home/history.dart';
+import 'package:electrio/view/home/settings.dart';
+import 'package:electrio/view/home/map.dart';
+import 'package:electrio/view/home/stations.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,8 +17,8 @@ class _HomeScreenState extends State<HomeScreen> {
   // List of screens to display
   final List<Widget> _children = [
     Home(),
-    ScreenTwo(),
-    ChargingScreen(),
+    StationsScreen(),
+    HistoryScreen(),
     ScreenFour(),
   ];
 

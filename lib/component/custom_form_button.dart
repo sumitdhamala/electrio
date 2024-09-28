@@ -1,3 +1,4 @@
+import 'package:electrio/component/constants/constants.dart';
 import 'package:flutter/material.dart';
 
 class CustomFormButton extends StatelessWidget {
@@ -13,7 +14,7 @@ class CustomFormButton extends StatelessWidget {
     return Container(
       width: size.width * 0.8,
       decoration: BoxDecoration(
-        color: Colors.green,
+        color: primarycolor,
         borderRadius: BorderRadius.circular(26),
       ),
       child: TextButton(

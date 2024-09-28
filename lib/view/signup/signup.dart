@@ -3,7 +3,7 @@ import 'package:electrio/component/custom_form_button.dart';
 import 'package:electrio/component/custom_textfield.dart';
 import 'package:electrio/component/page_header.dart';
 import 'package:electrio/component/page_heading.dart';
-import 'package:electrio/view/loginpage.dart';
+import 'package:electrio/view/signup/loginpage.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

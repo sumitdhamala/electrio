@@ -1,3 +1,4 @@
+import 'package:electrio/component/constants/constants.dart';
 import 'package:flutter/material.dart';
 
 class CustomInputField extends StatefulWidget {
@@ -64,10 +65,10 @@ class _CustomInputFieldState extends State<CustomInputField> {
               ),
               // Customizing the border colors
               enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.green),
+                borderSide: BorderSide(color: primarycolor),
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.green),
+                borderSide: BorderSide(color: primarycolor),
               ),
               errorBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Colors.red),

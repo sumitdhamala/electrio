@@ -1,7 +1,7 @@
-import 'package:electrio/view/forget_password.dart';
+import 'package:electrio/view/signup/forget_password.dart';
 import 'package:electrio/view/home_screen.dart';
-import 'package:electrio/view/loginpage.dart';
-import 'package:electrio/view/signup.dart';
+import 'package:electrio/view/signup/loginpage.dart';
+import 'package:electrio/view/signup/signup.dart';
 import 'package:electrio/view/splash_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -16,13 +16,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
       routes: {
-        '/': (context) => SplashScreen(),
+        // '/': (context) => SplashScreen(),
         '/login': (context) => LoginPage(),
         '/signup': (context) => SignupPage(),
         '/forgetPassword': (context) => ForgetPasswordPage(),
-        '/home': (context) => HomeScreen(),
+        '/': (context) => HomeScreen(),
       },
     );
   }

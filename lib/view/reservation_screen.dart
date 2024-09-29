@@ -1,7 +1,10 @@
+import 'package:electrio/model/booking_model.dart';
 import 'package:electrio/model/station_model.dart';
 import 'package:electrio/view/booking_details.dart';
+import 'package:electrio/provider/booking_provider.dart'; // Import the booking provider
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // For date and time formatting
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart'; // Import provider
 
 class ReservationScreen extends StatefulWidget {
   final Station station;
@@ -49,7 +52,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Book a Reservation'),
-        backgroundColor: Colors.green, // Green AppBar
+        backgroundColor: Colors.green,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -62,27 +65,23 @@ class _ReservationScreenState extends State<ReservationScreen> {
             ),
             const SizedBox(height: 16),
             ListTile(
-              leading:
-                  Icon(Icons.calendar_today, color: Colors.green), // Green icon
+              leading: Icon(Icons.calendar_today, color: Colors.green),
               title: Text(
                 selectedDate == null
                     ? 'Select Date'
                     : DateFormat.yMMMd().format(selectedDate!),
               ),
-              trailing: Icon(Icons.arrow_drop_down,
-                  color: Colors.green), // Green dropdown icon
+              trailing: Icon(Icons.arrow_drop_down, color: Colors.green),
               onTap: () => _selectDate(context),
             ),
             ListTile(
-              leading:
-                  Icon(Icons.access_time, color: Colors.green), // Green icon
+              leading: Icon(Icons.access_time, color: Colors.green),
               title: Text(
                 selectedTime == null
                     ? 'Select Time'
                     : selectedTime!.format(context),
               ),
-              trailing: Icon(Icons.arrow_drop_down,
-                  color: Colors.green), // Green dropdown icon
+              trailing: Icon(Icons.arrow_drop_down, color: Colors.green),
               onTap: () => _selectTime(context),
             ),
             const SizedBox(height: 16),
@@ -110,6 +109,18 @@ class _ReservationScreenState extends State<ReservationScreen> {
                   if (selectedDate != null &&
                       selectedTime != null &&
                       selectedPortType != null) {
+                    // Create a new booking instance
+                    final booking = Booking(
+                      stationName: widget.station.name,
+                      date: DateFormat.yMMMd().format(selectedDate!),
+                      time: selectedTime!.format(context),
+                      portType: selectedPortType!,
+                    );
+
+                    // Add booking to provider
+                    Provider.of<BookingProvider>(context, listen: false)
+                        .addBooking(booking);
+
                     // Navigate to the BookingDetailsScreen with the reservation details
                     Navigator.push(
                       context,
@@ -130,7 +141,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green, // Green button
+                  backgroundColor: Colors.green,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 36, vertical: 12),
                 ),

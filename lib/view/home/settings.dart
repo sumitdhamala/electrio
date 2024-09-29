@@ -1,5 +1,7 @@
 // settings_screen.dart
 import 'package:electrio/component/customclip_bar.dart';
+import 'package:electrio/view/profile_sscreen.dart';
+import 'package:electrio/view/signup/forget_password.dart';
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -17,7 +19,6 @@ class SettingsScreen extends StatelessWidget {
             title: Text('Profile'),
             trailing: Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
-              // Navigate to Profile Screen
               _navigateToProfile(context);
             },
           ),
@@ -63,16 +64,18 @@ class SettingsScreen extends StatelessWidget {
 
   // Navigate to Profile Screen
   void _navigateToProfile(BuildContext context) {
-    // Implement navigation logic here
-    // For example: Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen()));
-    print('Navigating to Profile Screen');
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ProfileScreen()),
+    );
   }
 
   // Navigate to Change Password Screen
   void _navigateToChangePassword(BuildContext context) {
-    // Implement navigation logic here
-    // For example: Navigator.push(context, MaterialPageRoute(builder: (context) => ChangePasswordScreen()));
-    print('Navigating to Change Password Screen');
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ForgetPasswordPage()),
+    );
   }
 
   // Navigate to About Screen

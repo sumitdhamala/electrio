@@ -1,9 +1,8 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:electrio/component/constants/constants.dart';
 import 'package:electrio/view/home/history.dart';
 import 'package:electrio/view/home/settings.dart';
 import 'package:electrio/view/home/map.dart';
-import 'package:electrio/view/home/stations.dart';
+import 'package:electrio/view/home/station/stations.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {

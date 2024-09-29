@@ -1,4 +1,3 @@
-import 'package:electrio/component/constants/constants.dart';
 import 'package:flutter/material.dart';
 
 class CustomInputField extends StatefulWidget {
@@ -8,6 +7,8 @@ class CustomInputField extends StatefulWidget {
   final bool suffixIcon;
   final bool? isDense;
   final bool obscureText;
+  final TextEditingController? controller; // Add this
+  final Function(String?)? onChanged; // Add onChanged parameter
 
   const CustomInputField({
     Key? key,
@@ -17,6 +18,8 @@ class CustomInputField extends StatefulWidget {
     this.suffixIcon = false,
     this.isDense,
     this.obscureText = false,
+    this.controller, // Add this
+    this.onChanged,
   }) : super(key: key);
 
   @override
@@ -40,6 +43,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           TextFormField(
+            controller: widget.controller, // Use the controller here
             obscureText: (widget.obscureText && _obscureText),
             decoration: InputDecoration(
               isDense: widget.isDense ?? false,
@@ -63,12 +67,13 @@ class _CustomInputFieldState extends State<CustomInputField> {
               suffixIconConstraints: BoxConstraints(
                 maxHeight: widget.isDense == true ? 33 : 48,
               ),
-              // Customizing the border colors
               enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: primarycolor),
+                borderSide:
+                    BorderSide(color: Colors.green), // Update color as needed
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: primarycolor),
+                borderSide:
+                    BorderSide(color: Colors.green), // Update color as needed
               ),
               errorBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Colors.red),
@@ -79,6 +84,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
             ),
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: widget.validator,
+            onChanged: widget.onChanged, // Add onChanged to TextFormField
           ),
         ],
       ),

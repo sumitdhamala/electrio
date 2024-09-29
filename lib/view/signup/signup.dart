@@ -3,11 +3,13 @@ import 'package:electrio/component/custom_form_button.dart';
 import 'package:electrio/component/custom_textfield.dart';
 import 'package:electrio/component/page_header.dart';
 import 'package:electrio/component/page_heading.dart';
+import 'package:electrio/provider/user_provider.dart'; // Import UserProvider
 import 'package:electrio/view/signup/loginpage.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart'; // Import provider package
 
 class SignupPage extends StatefulWidget {
   const SignupPage({Key? key}) : super(key: key);
@@ -19,8 +21,18 @@ class SignupPage extends StatefulWidget {
 class _SignupPageState extends State<SignupPage> {
   File? _profileImage;
 
+  // Form key
   final _signupFormKey = GlobalKey<FormState>();
 
+  // Controllers
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _contactController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  final _addressController = TextEditingController();
+
+  // Profile image picker
   Future _pickProfileImage() async {
     try {
       final image = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -92,56 +104,63 @@ class _SignupPageState extends State<SignupPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 16,
-                      ),
+                      const SizedBox(height: 16),
                       CustomInputField(
-                          labelText: 'Name',
-                          hintText: 'Your name',
-                          isDense: true,
-                          validator: (textValue) {
-                            if (textValue == null || textValue.isEmpty) {
-                              return 'Name field is required!';
-                            }
-                            return null;
-                          }),
-                      const SizedBox(
-                        height: 16,
+                        labelText: 'Name',
+                        hintText: 'Your name',
+                        controller: _nameController,
+                        validator: (textValue) {
+                          if (textValue == null || textValue.isEmpty) {
+                            return 'Name field is required!';
+                          }
+                          return null;
+                        },
                       ),
+                      const SizedBox(height: 16),
                       CustomInputField(
-                          labelText: 'Email',
-                          hintText: 'Your email id',
-                          isDense: true,
-                          validator: (textValue) {
-                            if (textValue == null || textValue.isEmpty) {
-                              return 'Email is required!';
-                            }
-                            if (!EmailValidator.validate(textValue)) {
-                              return 'Please enter a valid email';
-                            }
-                            return null;
-                          }),
-                      const SizedBox(
-                        height: 16,
+                        labelText: 'Email',
+                        hintText: 'Your email id',
+                        controller: _emailController,
+                        validator: (textValue) {
+                          if (textValue == null || textValue.isEmpty) {
+                            return 'Email is required!';
+                          }
+                          if (!EmailValidator.validate(textValue)) {
+                            return 'Please enter a valid email';
+                          }
+                          return null;
+                        },
                       ),
+                      const SizedBox(height: 16),
                       CustomInputField(
-                          labelText: 'Contact no.',
-                          hintText: 'Your contact number',
-                          isDense: true,
-                          validator: (textValue) {
-                            if (textValue == null || textValue.isEmpty) {
-                              return 'Contact number is required!';
-                            }
-                            return null;
-                          }),
-                      const SizedBox(
-                        height: 16,
+                        labelText: 'Contact no.',
+                        hintText: 'Your contact number',
+                        controller: _contactController,
+                        validator: (textValue) {
+                          if (textValue == null || textValue.isEmpty) {
+                            return 'Contact number is required!';
+                          }
+                          return null;
+                        },
                       ),
+                      const SizedBox(height: 16),
+                      CustomInputField(
+                        labelText: 'Address',
+                        hintText: 'Your address',
+                        controller: _addressController,
+                        validator: (textValue) {
+                          if (textValue == null || textValue.isEmpty) {
+                            return 'Address is required!';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
                       CustomInputField(
                         labelText: 'Password',
                         hintText: 'Your password',
-                        isDense: true,
                         obscureText: true,
+                        controller: _passwordController,
                         validator: (textValue) {
                           if (textValue == null || textValue.isEmpty) {
                             return 'Password is required!';
@@ -150,23 +169,36 @@ class _SignupPageState extends State<SignupPage> {
                         },
                         suffixIcon: true,
                       ),
-                      const SizedBox(
-                        height: 22,
+                      const SizedBox(height: 16),
+                      CustomInputField(
+                        labelText: 'Confirm Password',
+                        hintText: 'Confirm your password',
+                        obscureText: true,
+                        controller: _confirmPasswordController,
+                        validator: (textValue) {
+                          if (textValue == null || textValue.isEmpty) {
+                            return 'Confirm password is required!';
+                          }
+                          if (textValue != _passwordController.text) {
+                            return 'Passwords do not match!';
+                          }
+                          return null;
+                        },
+                        suffixIcon: true,
                       ),
+                      const SizedBox(height: 22),
                       CustomFormButton(
                         innerText: 'Signup',
                         onPressed: _handleSignupUser,
                       ),
-                      const SizedBox(
-                        height: 18,
-                      ),
+                      const SizedBox(height: 18),
                       SizedBox(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const Text(
-                              'Already have an account ? ',
+                              'Already have an account? ',
                               style: TextStyle(
                                   fontSize: 13,
                                   color: Color(0xff939393),
@@ -191,9 +223,7 @@ class _SignupPageState extends State<SignupPage> {
                           ],
                         ),
                       ),
-                      const SizedBox(
-                        height: 30,
-                      ),
+                      const SizedBox(height: 30),
                     ],
                   ),
                 ),
@@ -206,11 +236,26 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   void _handleSignupUser() {
-    // signup user
     if (_signupFormKey.currentState!.validate()) {
+      // Get the UserProvider instance
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+      // Set user information in the provider
+      userProvider.setUserInfo(
+        name: _nameController.text,
+        email: _emailController.text,
+        contact: _contactController.text,
+        address: _addressController.text,
+        profileImage: _profileImage,
+      );
+
+      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Submitting data..')),
       );
+
+      // Navigate to the profile screen or home page
+      Navigator.pushReplacementNamed(context, '/home');
     }
   }
 }

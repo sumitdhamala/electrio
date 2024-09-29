@@ -1,9 +1,12 @@
+import 'package:electrio/provider/auth_provider.dart';
+import 'package:electrio/provider/user_provider.dart';
+import 'package:electrio/view/profile_sscreen.dart';
 import 'package:electrio/view/signup/forget_password.dart';
 import 'package:electrio/view/home_screen.dart';
 import 'package:electrio/view/signup/loginpage.dart';
 import 'package:electrio/view/signup/signup.dart';
-import 'package:electrio/view/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // Import the provider package
 
 void main() {
   runApp(const MyApp());
@@ -14,15 +17,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      routes: {
-        '/': (context) => SplashScreen(),
-        '/login': (context) => LoginPage(),
-        '/signup': (context) => SignupPage(),
-        '/forgetPassword': (context) => ForgetPasswordPage(),
-        '/home': (context) => HomeScreen(),
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider(), // Provide your AuthProvider
+        ),
+        ChangeNotifierProvider(
+          create: (_) => UserProvider(),
+        ),
+        // Add other providers here as needed
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        routes: {
+          // '/': (context) => const SplashScreen(),
+          '/login': (context) => const LoginPage(),
+          '/signup': (context) => const SignupPage(),
+          '/forgetPassword': (context) => const ForgetPasswordPage(),
+          '/home': (context) => HomeScreen(),
+          '/': (context) => ProfileScreen(),
+        },
+      ),
     );
   }
 }

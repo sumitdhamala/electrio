@@ -2,10 +2,12 @@ import 'package:electrio/component/custom_form_button.dart';
 import 'package:electrio/component/custom_textfield.dart';
 import 'package:electrio/component/page_header.dart';
 import 'package:electrio/component/page_heading.dart';
+import 'package:electrio/provider/auth_provider.dart';
 import 'package:electrio/view/signup/forget_password.dart';
 import 'package:electrio/view/signup/signup.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -16,16 +18,20 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _loginFormKey = GlobalKey<FormState>();
+  String _email = '';
+  String _password = '';
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    final authProvider = Provider.of<AuthProvider>(context);
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: const Color(0xffEEF1F3),
         body: Column(
           children: [
-            PageHeader(),
+            const PageHeader(),
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
@@ -54,6 +60,9 @@ class _LoginPageState extends State<LoginPage> {
                             }
                             return null;
                           },
+                          onChanged: (textValue) {
+                            _email = textValue!;
+                          },
                         ),
                         const SizedBox(height: 16),
                         CustomInputField(
@@ -66,6 +75,9 @@ class _LoginPageState extends State<LoginPage> {
                               return 'Password is required!';
                             }
                             return null;
+                          },
+                          onChanged: (textValue) {
+                            _password = textValue!;
                           },
                         ),
                         const SizedBox(height: 16),
@@ -94,8 +106,13 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 20),
                         CustomFormButton(
-                          innerText: 'Login',
-                          onPressed: _handleLoginUser,
+                          innerText:
+                              authProvider.isLoading ? 'Loading...' : 'Login',
+                          onPressed: authProvider.isLoading
+                              ? null
+                              : () {
+                                  _handleLoginUser(context);
+                                },
                         ),
                         const SizedBox(height: 18),
                         SizedBox(
@@ -145,17 +162,19 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _handleLoginUser() {
-    // Login user
-    if (_loginFormKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Submitting data..')),
-      );
+  void _handleLoginUser(BuildContext context) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-      // Delay navigation to the home page
-      Future.delayed(const Duration(seconds: 4), () { 
+    if (_loginFormKey.currentState!.validate()) {
+      bool success = await authProvider.loginUser(_email, _password);
+
+      if (success) {
         Navigator.pushReplacementNamed(context, '/home');
-      });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login failed. Invalid credentials.')),
+        );
+      }
     }
   }
 }

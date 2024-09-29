@@ -1,5 +1,5 @@
-// station_detail_sheet.dart
 import 'package:electrio/model/station_model.dart';
+import 'package:electrio/view/reservation_screen.dart';
 import 'package:flutter/material.dart';
 
 class StationDetailSheet extends StatelessWidget {
@@ -45,7 +45,7 @@ class StationDetailSheet extends StatelessWidget {
                   children: [
                     Text(
                       station.name,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -53,25 +53,33 @@ class StationDetailSheet extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       station.address,
-                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 14),
                     ),
                     const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(Icons.phone, color: Colors.green),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Contact Station',
-                          style: TextStyle(color: Colors.green),
-                        ),
-                      ],
+                    GestureDetector(
+                      onTap: () {
+                        // Add contact functionality here
+                      },
+                      child: Row(
+                        children: [
+                          Icon(Icons.phone,
+                              color: Colors.green.shade600), // Changed to green
+                          const SizedBox(width: 4),
+                          Text(
+                            'Contact Station',
+                            style: TextStyle(
+                                color:
+                                    Colors.green.shade600), // Changed to green
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
               Icon(
                 Icons.favorite_border,
-                color: Colors.red,
+                color: Colors.redAccent,
               ),
             ],
           ),
@@ -82,16 +90,17 @@ class StationDetailSheet extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Plugs',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(Icons.power, color: Colors.black),
+                      Icon(Icons.power_outlined,
+                          color: Colors.green), // Changed to green
                       const SizedBox(width: 4),
-                      Text('CCS2 - 7.2Kw AC'),
+                      const Text('CCS2 - 7.2Kw AC'),
                     ],
                   ),
                 ],
@@ -99,16 +108,17 @@ class StationDetailSheet extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Amenities',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(Icons.local_parking, color: Colors.black),
+                      Icon(Icons.local_parking,
+                          color: Colors.green), // Changed to green
                       const SizedBox(width: 8),
-                      Icon(Icons.wc, color: Colors.black),
+                      Icon(Icons.wc, color: Colors.green), // Changed to green
                     ],
                   ),
                 ],
@@ -120,27 +130,41 @@ class StationDetailSheet extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  // Add get direction functionality
+                },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
+                  backgroundColor: Colors.green, // Changed to green
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
-                child: Text('Get Direction'),
+                child: const Text(
+                  'Get Direction',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
               OutlinedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ReservationScreen(station: station),
+                    ),
+                  );
+                },
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  side: BorderSide(color: Colors.black),
+                  foregroundColor: Colors.green,
+                  side: BorderSide(color: Colors.green), // Changed to green
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
-                child: Text('Get Details'),
+                child: const Text('Book Now'),
               ),
             ],
           ),

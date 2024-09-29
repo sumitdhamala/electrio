@@ -23,6 +23,12 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
         backgroundColor: const Color(0xffEEF1F3),
         body: Column(
           children: [
+            Align(
+              alignment: Alignment.topLeft,
+              child: IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.arrow_back)),
+            ),
             const PageHeader(),
             Expanded(
               child: Container(
@@ -63,25 +69,25 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
                         const SizedBox(
                           height: 20,
                         ),
-                        Container(
-                          alignment: Alignment.center,
-                          child: GestureDetector(
-                            onTap: () => {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const LoginPage()))
-                            },
-                            child: const Text(
-                              'Back to login',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
+                        // Container(
+                        //   alignment: Alignment.center,
+                        //   child: GestureDetector(
+                        //     onTap: () => {
+                        //       Navigator.push(
+                        //           context,
+                        //           MaterialPageRoute(
+                        //               builder: (context) => const LoginPage()))
+                        //     },
+                        //     child: const Text(
+                        //       'Back to login',
+                        //       style: TextStyle(
+                        //         fontSize: 13,
+                        //         color: Colors.green,
+                        //         fontWeight: FontWeight.bold,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),

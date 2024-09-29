@@ -1,5 +1,6 @@
-// settings_screen.dart
 import 'package:electrio/component/customclip_bar.dart';
+import 'package:electrio/view/booking_details.dart';
+import 'package:electrio/view/mybooking.dart';
 import 'package:electrio/view/profile_sscreen.dart';
 import 'package:electrio/view/signup/forget_password.dart';
 import 'package:flutter/material.dart';
@@ -30,8 +31,18 @@ class SettingsScreen extends StatelessWidget {
             title: Text('Change Password'),
             trailing: Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
-              // Navigate to Change Password Screen
               _navigateToChangePassword(context);
+            },
+          ),
+          Divider(),
+
+          // My Bookings Option
+          ListTile(
+            leading: Icon(Icons.bookmark, color: Colors.green),
+            title: Text('My Bookings'),
+            trailing: Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              _navigateToMyBookings(context); // Navigate to My Bookings Screen
             },
           ),
           Divider(),
@@ -42,7 +53,6 @@ class SettingsScreen extends StatelessWidget {
             title: Text('About'),
             trailing: Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
-              // Navigate to About Screen
               _navigateToAbout(context);
             },
           ),
@@ -53,7 +63,6 @@ class SettingsScreen extends StatelessWidget {
             leading: Icon(Icons.logout, color: Colors.red),
             title: Text('Logout'),
             onTap: () {
-              // Handle logout action
               _showLogoutDialog(context);
             },
           ),
@@ -64,24 +73,26 @@ class SettingsScreen extends StatelessWidget {
 
   // Navigate to Profile Screen
   void _navigateToProfile(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => ProfileScreen()),
-    );
+    Navigator.pushNamed(context, "/profile");
   }
 
   // Navigate to Change Password Screen
   void _navigateToChangePassword(BuildContext context) {
+    Navigator.pushNamed(context, "/forgetPassword");
+  }
+
+  // Navigate to My Bookings Screen
+  void _navigateToMyBookings(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ForgetPasswordPage()),
+      MaterialPageRoute(
+          builder: (context) =>
+              MyBookingsScreen()), // Navigate to MyBookingsScreen
     );
   }
 
   // Navigate to About Screen
   void _navigateToAbout(BuildContext context) {
-    // Implement navigation logic here
-    // For example: Navigator.push(context, MaterialPageRoute(builder: (context) => AboutScreen()));
     print('Navigating to About Screen');
   }
 
@@ -99,10 +110,8 @@ class SettingsScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              // Handle the logout process here
-              Navigator.of(context).pop();
+              Navigator.pushNamed(context, '/login');
               print('Logged out');
-              // You can also navigate to the login screen after logging out
             },
             child: Text('Logout'),
           ),

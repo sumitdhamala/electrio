@@ -27,12 +27,12 @@ class CustomCurvedAppBar extends StatelessWidget
 
   @override
   Size get preferredSize =>
-      Size.fromHeight(120.0); // Sets the height of the AppBar
+      Size.fromHeight(80.0); // Sets the height of the AppBar
 }
 
 // Custom Clipper for Curving the AppBar
 class AppBarClipper extends CustomClipper<Path> {
-  @override
+  @override 
   Path getClip(Size size) {
     Path path = Path();
     path.lineTo(0, size.height - 30);

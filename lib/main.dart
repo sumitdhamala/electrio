@@ -17,11 +17,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes: {
-        // '/': (context) => SplashScreen(),
+        '/': (context) => SplashScreen(),
         '/login': (context) => LoginPage(),
         '/signup': (context) => SignupPage(),
         '/forgetPassword': (context) => ForgetPasswordPage(),
-        '/': (context) => HomeScreen(),
+        '/home': (context) => HomeScreen(),
       },
     );
   }

@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Home(),
     StationsScreen(),
     HistoryScreen(),
-    ScreenFour(),
+    SettingsScreen(),
   ];
 
   @override

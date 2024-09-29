@@ -153,8 +153,8 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       // Delay navigation to the home page
-      Future.delayed(const Duration(seconds: 4), () {
-        Navigator.pushNamed(context, '/home');
+      Future.delayed(const Duration(seconds: 4), () { 
+        Navigator.pushReplacementNamed(context, '/home');
       });
     }
   }

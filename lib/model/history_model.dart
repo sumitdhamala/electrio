@@ -1,4 +1,3 @@
-// charging_history.dart
 class ChargingHistory {
   final String stationName;
   final String date;

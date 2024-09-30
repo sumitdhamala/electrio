@@ -6,8 +6,9 @@ import 'package:electrio/view/signup/forget_password.dart';
 import 'package:electrio/view/home_screen.dart';
 import 'package:electrio/view/signup/loginpage.dart';
 import 'package:electrio/view/signup/signup.dart';
+import 'package:electrio/view/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; 
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => AuthProvider(), 
+          create: (_) => AuthProvider(),
         ),
         ChangeNotifierProvider(
           create: (_) => UserProvider(),
@@ -29,16 +30,15 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => BookingProvider(),
         ),
-        
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         routes: {
-          // '/': (context) => const SplashScreen(),
+          '/': (context) => const SplashScreen(),
           '/login': (context) => const LoginPage(),
           '/signup': (context) => const SignupPage(),
           '/forgetPassword': (context) => const ForgetPasswordPage(),
-          '/': (context) => HomeScreen(),
+          '/home': (context) => HomeScreen(),
           '/profile': (context) => ProfileScreen(),
         },
       ),

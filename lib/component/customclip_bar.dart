@@ -18,7 +18,10 @@ class CustomCurvedAppBar extends StatelessWidget
       clipper: AppBarClipper(),
       child: AppBar(
         backgroundColor: backgroundColor,
-        title: Text(title),
+        title: Text(
+          title,
+          style: const TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
         elevation: 0,
       ),
@@ -32,7 +35,7 @@ class CustomCurvedAppBar extends StatelessWidget
 
 // Custom Clipper for Curving the AppBar
 class AppBarClipper extends CustomClipper<Path> {
-  @override 
+  @override
   Path getClip(Size size) {
     Path path = Path();
     path.lineTo(0, size.height - 30);

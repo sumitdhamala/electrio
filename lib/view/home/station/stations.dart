@@ -53,7 +53,6 @@ class StationsScreen extends StatelessWidget {
   // Function to show the bottom sliding sheet
   void _showStationDetails(BuildContext context, Station station) {
     showModalBottomSheet(
-      
       context: context,
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(

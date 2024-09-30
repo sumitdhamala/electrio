@@ -93,7 +93,7 @@ class ProfileScreen extends StatelessWidget {
               ),
               child: Text(
                 'Edit Profile',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 16, color: Colors.white),
               ),
             ),
             SizedBox(height: 20),

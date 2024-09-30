@@ -124,7 +124,7 @@ class HistoryTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '\$${history.price.toStringAsFixed(2)}',
+                  '\Rs.${history.price.toStringAsFixed(2)}',
                   style: TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.bold,

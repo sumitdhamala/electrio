@@ -1,10 +1,11 @@
+import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/model/booking_model.dart';
 import 'package:electrio/model/station_model.dart';
 import 'package:electrio/view/booking_details.dart';
-import 'package:electrio/provider/booking_provider.dart'; // Import the booking provider
+import 'package:electrio/provider/booking_provider.dart'; 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart'; // Import provider
+import 'package:provider/provider.dart'; 
 
 class ReservationScreen extends StatefulWidget {
   final Station station;
@@ -27,6 +28,18 @@ class _ReservationScreenState extends State<ReservationScreen> {
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime(2101),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.green, // Selected date color
+              onPrimary: Colors.white, // Text on selected date
+            ),
+            dialogBackgroundColor: Colors.white,
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null && picked != selectedDate) {
       setState(() {
@@ -39,6 +52,19 @@ class _ReservationScreenState extends State<ReservationScreen> {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.green, 
+              onPrimary: Colors.white, 
+              onSurface: Colors.green, 
+            ),
+            dialogBackgroundColor: Colors.white,
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null && picked != selectedTime) {
       setState(() {
@@ -50,10 +76,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Book a Reservation'),
-        backgroundColor: Colors.green,
-      ),
+      appBar: CustomCurvedAppBar(title: 'Reservation'),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -70,6 +93,10 @@ class _ReservationScreenState extends State<ReservationScreen> {
                 selectedDate == null
                     ? 'Select Date'
                     : DateFormat.yMMMd().format(selectedDate!),
+                style: TextStyle(
+                    color: selectedDate == null
+                        ? Colors.black
+                        : Colors.green), // Change text color
               ),
               trailing: Icon(Icons.arrow_drop_down, color: Colors.green),
               onTap: () => _selectDate(context),
@@ -80,6 +107,10 @@ class _ReservationScreenState extends State<ReservationScreen> {
                 selectedTime == null
                     ? 'Select Time'
                     : selectedTime!.format(context),
+                style: TextStyle(
+                    color: selectedTime == null
+                        ? Colors.black
+                        : Colors.green), // Change text color
               ),
               trailing: Icon(Icons.arrow_drop_down, color: Colors.green),
               onTap: () => _selectTime(context),
@@ -145,7 +176,10 @@ class _ReservationScreenState extends State<ReservationScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 36, vertical: 12),
                 ),
-                child: const Text('Confirm Reservation'),
+                child: const Text(
+                  'Confirm Reservation',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
           ],

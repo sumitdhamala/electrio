@@ -1,3 +1,4 @@
+import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/provider/booking_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -6,7 +7,7 @@ class MyBookingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('My Bookings')),
+      appBar: CustomCurvedAppBar(title: "My Bookings"),
       body: Consumer<BookingProvider>(
         builder: (context, bookingProvider, child) {
           if (bookingProvider.bookings.isEmpty) {

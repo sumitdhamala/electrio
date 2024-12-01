@@ -15,7 +15,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // List of screens to display
   final List<Widget> _children = [
-    Home(),
+    HomeView(),
     StationsScreen(),
     HistoryScreen(),
     SettingsScreen(),

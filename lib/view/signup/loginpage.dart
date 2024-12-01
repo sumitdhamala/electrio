@@ -166,13 +166,20 @@ class _LoginPageState extends State<LoginPage> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     if (_loginFormKey.currentState!.validate()) {
-      bool success = await authProvider.loginUser(_email, _password);
+      try {
+        bool success = await authProvider.loginUser(_email, _password);
 
-      if (success) {
-        Navigator.pushReplacementNamed(context, '/home');
-      } else {
+        if (success) {
+          // Navigate to the home screen
+          Navigator.pushReplacementNamed(context, '/home');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login failed. Invalid credentials.')),
+          );
+        }
+      } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login failed. Invalid credentials.')),
+          SnackBar(content: Text('Error: ${e.toString()}')),
         );
       }
     }

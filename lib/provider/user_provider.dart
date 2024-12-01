@@ -1,28 +1,62 @@
-// user_provider.dart
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class UserProvider extends ChangeNotifier {
-  // Direct public variables
   String name = '';
   String email = '';
   String contact = '';
   String address = '';
   File? profileImage;
-
-  // Method to update user information
-  void setUserInfo({
-    required String name,
+  Future<void> registerUser({
+    required String firstName,
+    required String lastName,
+    required String username,
     required String email,
     required String contact,
     required String address,
-    File? profileImage,
-  }) {
-    this.name = name;
-    this.email = email;
-    this.contact = contact;
-    this.address = address;
-    this.profileImage = profileImage;
-    notifyListeners(); // Notify listeners when data changes
+    required String password,
+    required String confirmPassword,
+  }) async {
+    try {
+      var response = await http.post(
+        Uri.parse(
+            'http://localhost:8000/users/register/'), // Replace with server IP
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'first_name': firstName,
+          'last_name': lastName,
+          'username': username,
+          'email': email,
+          'phone_no': contact,
+          'address': address,
+          'password': password,
+          'confirm_password': confirmPassword,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+        print("User registered: $responseData");
+
+        // Save the data locally or update state
+        this.name = firstName;
+        this.email = email;
+        this.contact = contact;
+        this.address = address;
+
+        notifyListeners();
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        print('Error Response: ${errorResponse}');
+        throw Exception(errorResponse['detail'] ?? 'Unknown error occurred');
+      }
+    } catch (e) {
+      print('Exception: $e');
+      throw Exception('Failed to register user: $e');
+    }
   }
 }

@@ -25,7 +25,9 @@ class _SignupPageState extends State<SignupPage> {
   final _signupFormKey = GlobalKey<FormState>();
 
   // Controllers
-  final _nameController = TextEditingController();
+  final _firstnameController = TextEditingController();
+  final _lastnameController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _contactController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -68,47 +70,71 @@ class _SignupPageState extends State<SignupPage> {
                       const PageHeading(
                         title: 'Create Account',
                       ),
-                      SizedBox(
-                        width: 130,
-                        height: 130,
-                        child: CircleAvatar(
-                          backgroundColor: Colors.grey.shade200,
-                          backgroundImage: _profileImage != null
-                              ? FileImage(_profileImage!)
-                              : null,
-                          child: Stack(
-                            children: [
-                              Positioned(
-                                bottom: 5,
-                                right: 5,
-                                child: GestureDetector(
-                                  onTap: _pickProfileImage,
-                                  child: Container(
-                                    height: 50,
-                                    width: 50,
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue.shade400,
-                                      border: Border.all(
-                                          color: Colors.white, width: 3),
-                                      borderRadius: BorderRadius.circular(25),
-                                    ),
-                                    child: const Icon(
-                                      Icons.camera_alt_sharp,
-                                      color: Colors.white,
-                                      size: 25,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      // SizedBox(
+                      //   width: 130,
+                      //   height: 130,
+                      //   child: CircleAvatar(
+                      //     backgroundColor: Colors.grey.shade200,
+                      //     backgroundImage: _profileImage != null
+                      //         ? FileImage(_profileImage!)
+                      //         : null,
+                      //     child: Stack(
+                      //       children: [
+                      //         // Positioned(
+                      //         //   bottom: 5,
+                      //         //   right: 5,
+                      //         //   child: GestureDetector(
+                      //         //     onTap: _pickProfileImage,
+                      //         //     child: Container(
+                      //         //       height: 50,
+                      //         //       width: 50,
+                      //         //       decoration: BoxDecoration(
+                      //         //         color: Colors.blue.shade400,
+                      //         //         border: Border.all(
+                      //         //             color: Colors.white, width: 3),
+                      //         //         borderRadius: BorderRadius.circular(25),
+                      //         //       ),
+                      //         //       child: const Icon(
+                      //         //         Icons.camera_alt_sharp,
+                      //         //         color: Colors.white,
+                      //         //         size: 25,
+                      //         //       ),
+                      //         //     ),
+                      //         //   ),
+                      //         // ),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
+                      const SizedBox(height: 16),
+                      CustomInputField(
+                        labelText: 'First Name',
+                        hintText: 'Your First name',
+                        controller: _firstnameController,
+                        validator: (textValue) {
+                          if (textValue == null || textValue.isEmpty) {
+                            return 'Name field is required!';
+                          }
+                          return null;
+                        },
                       ),
                       const SizedBox(height: 16),
                       CustomInputField(
-                        labelText: 'Name',
-                        hintText: 'Your name',
-                        controller: _nameController,
+                        labelText: 'Last Name',
+                        hintText: 'Your Last name',
+                        controller: _lastnameController,
+                        validator: (textValue) {
+                          if (textValue == null || textValue.isEmpty) {
+                            return 'Name field is required!';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      CustomInputField(
+                        labelText: 'Username',
+                        hintText: 'Username',
+                        controller: _usernameController,
                         validator: (textValue) {
                           if (textValue == null || textValue.isEmpty) {
                             return 'Name field is required!';
@@ -235,27 +261,39 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  void _handleSignupUser() {
+  void _handleSignupUser() async {
     if (_signupFormKey.currentState!.validate()) {
-      // Get the UserProvider instance
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      try {
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-      // Set user information in the provider
-      userProvider.setUserInfo(
-        name: _nameController.text,
-        email: _emailController.text,
-        contact: _contactController.text,
-        address: _addressController.text,
-        profileImage: _profileImage,
-      );
+        // Show loading indicator
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Submitting data...')),
+        );
 
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Submitting data..')),
-      );
+        // Attempt user registration
+        await userProvider.registerUser(
+          firstName: _firstnameController.text,
+          lastName: _lastnameController.text,
+          username: _usernameController.text,
+          email: _emailController.text,
+          contact: _contactController.text,
+          address: _addressController.text,
+          password: _passwordController.text,
+          confirmPassword: _confirmPasswordController.text,
+        );
 
-      // Navigate to the profile screen or home page
-      Navigator.pushReplacementNamed(context, '/home');
+        // Show success message and navigate
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registration successful!')),
+        );
+        Navigator.pushReplacementNamed(context, '/home');
+      } catch (e) {
+        // Display error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
     }
   }
 }

@@ -9,6 +9,15 @@ class UserProvider extends ChangeNotifier {
   String contact = '';
   String address = '';
   File? profileImage;
+  String? _token;
+
+  /// **Set Token**
+void setToken(String token) {
+    _token = token;
+    notifyListeners();
+  }
+
+  /// **Register User**
   Future<void> registerUser({
     required String firstName,
     required String lastName,
@@ -42,7 +51,7 @@ class UserProvider extends ChangeNotifier {
         final responseData = jsonDecode(response.body);
         print("User registered: $responseData");
 
-        // Save the data locally or update state
+        // Save data locally
         this.name = firstName;
         this.email = email;
         this.contact = contact;
@@ -51,7 +60,7 @@ class UserProvider extends ChangeNotifier {
         notifyListeners();
       } else {
         final errorResponse = jsonDecode(response.body);
-        print('Error Response: ${errorResponse}');
+        print('Error Response: $errorResponse');
         throw Exception(errorResponse['detail'] ?? 'Unknown error occurred');
       }
     } catch (e) {
@@ -59,4 +68,43 @@ class UserProvider extends ChangeNotifier {
       throw Exception('Failed to register user: $e');
     }
   }
+
+  /// **Fetch User Details**
+Future<void> fetchUserDetails() async {
+    try {
+      if (_token == null) {
+        throw Exception('Token is missing. Please log in again.');
+      }
+
+      final response = await http.get(
+        Uri.parse(
+            'http://localhost:8000/users/me/'), // Replace with actual endpoint
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Token $_token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        // Map the response to the UserProvider fields
+        name = data['first_name']  ?? '';
+        email = data['email'] ?? '';
+        contact = data['phone_no'] ?? '';
+        address = data['address'] ?? '';
+
+        notifyListeners();
+      } else {
+        final errorData = jsonDecode(response.body);
+        print(
+            'Error fetching user details: ${errorData['detail'] ?? 'Unknown error'}');
+        throw Exception(errorData['detail'] ?? 'Failed to fetch user details');
+      }
+    } catch (e) {
+      print('Error in fetchUserDetails: $e');
+      throw Exception('Failed to fetch user details: $e');
+    }
+  }
+
 }

@@ -3,6 +3,7 @@ import 'package:electrio/component/custom_textfield.dart';
 import 'package:electrio/component/page_header.dart';
 import 'package:electrio/component/page_heading.dart';
 import 'package:electrio/provider/auth_provider.dart';
+import 'package:electrio/provider/user_provider.dart';
 import 'package:electrio/view/signup/forget_password.dart';
 import 'package:electrio/view/signup/signup.dart';
 import 'package:email_validator/email_validator.dart';
@@ -164,22 +165,26 @@ class _LoginPageState extends State<LoginPage> {
 
   void _handleLoginUser(BuildContext context) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     if (_loginFormKey.currentState!.validate()) {
-      try {
-        bool success = await authProvider.loginUser(_email, _password);
+      bool success = await authProvider.loginUser(_email, _password);
 
-        if (success) {
-          // Navigate to the home screen
+      if (success) {
+        if (authProvider.token != null) {
+          userProvider
+              .setToken(authProvider.token!); // Pass the token to UserProvider
+          await userProvider.fetchUserDetails();
           Navigator.pushReplacementNamed(context, '/home');
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login failed. Invalid credentials.')),
+            const SnackBar(
+                content: Text('Token missing. Please log in again.')),
           );
         }
-      } catch (e) {
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
+          const SnackBar(content: Text('Login failed. Invalid credentials.')),
         );
       }
     }

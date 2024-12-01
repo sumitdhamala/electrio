@@ -12,7 +12,7 @@ class UserProvider extends ChangeNotifier {
   String? _token;
 
   /// **Set Token**
-void setToken(String token) {
+  void setToken(String token) {
     _token = token;
     notifyListeners();
   }
@@ -70,7 +70,7 @@ void setToken(String token) {
   }
 
   /// **Fetch User Details**
-Future<void> fetchUserDetails() async {
+  Future<void> fetchUserDetails() async {
     try {
       if (_token == null) {
         throw Exception('Token is missing. Please log in again.');
@@ -89,7 +89,7 @@ Future<void> fetchUserDetails() async {
         final data = jsonDecode(response.body);
 
         // Map the response to the UserProvider fields
-        name = data['first_name']  ?? '';
+        name = "${data['first_name']}  ${data['last_name']}" ?? '';
         email = data['email'] ?? '';
         contact = data['phone_no'] ?? '';
         address = data['address'] ?? '';
@@ -106,5 +106,4 @@ Future<void> fetchUserDetails() async {
       throw Exception('Failed to fetch user details: $e');
     }
   }
-
 }

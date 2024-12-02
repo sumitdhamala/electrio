@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:electrio/component/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider extends ChangeNotifier {
   String name = '';
@@ -9,7 +11,10 @@ class UserProvider extends ChangeNotifier {
   String contact = '';
   String address = '';
   File? profileImage;
-  String? _token;
+  String? _token; // Private variable for token
+
+  /// **Get Token**
+  String? get token => _token; // Public getter to access token
 
   /// **Set Token**
   void setToken(String token) {
@@ -30,8 +35,7 @@ class UserProvider extends ChangeNotifier {
   }) async {
     try {
       var response = await http.post(
-        Uri.parse(
-            'http://localhost:8000/users/register/'), // Replace with server IP
+        Uri.parse('$url/users/register/'), // Replace with server IP
         headers: {
           'Content-Type': 'application/json',
         },
@@ -72,38 +76,31 @@ class UserProvider extends ChangeNotifier {
   /// **Fetch User Details**
   Future<void> fetchUserDetails() async {
     try {
-      if (_token == null) {
-        throw Exception('Token is missing. Please log in again.');
-      }
+      final prefs = await SharedPreferences.getInstance();
+      // Get token from shared preferences if not already set
+      _token ??= prefs.getString('token');
+
+      if (_token == null) throw Exception('Token missing. Please log in.');
 
       final response = await http.get(
-        Uri.parse(
-            'http://localhost:8000/users/me/'), // Replace with actual endpoint
+        Uri.parse('$url/users/me/'),
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': 'Token $_token',
         },
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-
-        // Map the response to the UserProvider fields
-        name = "${data['first_name']}  ${data['last_name']}" ?? '';
+        name = "${data['first_name']} ${data['last_name']}";
         email = data['email'] ?? '';
         contact = data['phone_no'] ?? '';
         address = data['address'] ?? '';
-
         notifyListeners();
       } else {
-        final errorData = jsonDecode(response.body);
-        print(
-            'Error fetching user details: ${errorData['detail'] ?? 'Unknown error'}');
-        throw Exception(errorData['detail'] ?? 'Failed to fetch user details');
+        throw Exception('Failed to fetch user details');
       }
     } catch (e) {
-      print('Error in fetchUserDetails: $e');
-      throw Exception('Failed to fetch user details: $e');
+      print('Error fetching user details: $e');
     }
   }
 }

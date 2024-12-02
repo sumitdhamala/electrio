@@ -46,9 +46,7 @@ class _LoginPageState extends State<LoginPage> {
                     key: _loginFormKey,
                     child: Column(
                       children: [
-                        const PageHeading(
-                          title: 'Login',
-                        ),
+                        const PageHeading(title: 'Login'),
                         CustomInputField(
                           labelText: 'Email',
                           hintText: 'Your email id',
@@ -111,9 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                               authProvider.isLoading ? 'Loading...' : 'Login',
                           onPressed: authProvider.isLoading
                               ? null
-                              : () {
-                                  _handleLoginUser(context);
-                                },
+                              : () => _handleLoginUser(context),
                         ),
                         const SizedBox(height: 18),
                         SizedBox(
@@ -171,15 +167,23 @@ class _LoginPageState extends State<LoginPage> {
       bool success = await authProvider.loginUser(_email, _password);
 
       if (success) {
-        if (authProvider.token != null) {
-          userProvider
-              .setToken(authProvider.token!); // Pass the token to UserProvider
-          await userProvider.fetchUserDetails();
-          Navigator.pushReplacementNamed(context, '/home');
+        final token = authProvider.token;
+
+        if (token != null) {
+          try {
+            userProvider.setToken(token);
+            await userProvider.fetchUserDetails();
+            Navigator.pushReplacementNamed(context, '/home');
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error fetching user details: $e')),
+            );
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-                content: Text('Token missing. Please log in again.')),
+              content: Text('Token missing. Please log in again.'),
+            ),
           );
         }
       } else {

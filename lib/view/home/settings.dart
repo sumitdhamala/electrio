@@ -1,6 +1,7 @@
 import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/view/booking_details.dart';
 import 'package:electrio/view/settings/mybooking.dart';
+import 'package:electrio/view/settings/myvehicles.dart';
 import 'package:electrio/view/settings/profile_sscreen.dart';
 import 'package:electrio/view/signup/forget_password.dart';
 import 'package:flutter/material.dart';
@@ -91,7 +92,8 @@ class SettingsScreen extends StatelessWidget {
   }
 
   void _navigateToMyVehicles(BuildContext context) {
-    Navigator.pushNamed(context, "/forgetPassword");
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => VehicleDetailsScreen()));
   }
 
   // Navigate to My Bookings Screen

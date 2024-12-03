@@ -1,6 +1,7 @@
 import 'package:electrio/provider/auth_provider.dart';
 import 'package:electrio/provider/booking_provider.dart';
 import 'package:electrio/provider/user_provider.dart';
+import 'package:electrio/provider/vehicle_provider.dart';
 import 'package:electrio/view/settings/profile_sscreen.dart';
 import 'package:electrio/view/signup/forget_password.dart';
 import 'package:electrio/view/home_screen.dart';
@@ -34,17 +35,20 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => BookingProvider(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => VehicleProvider(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         routes: {
-          '/': (context) => const SplashScreen(),
-          '/login': (context) => const LoginPage(),
-          '/signup': (context) => const SignupPage(),
-          '/forgetPassword': (context) => const ForgetPasswordPage(),
+          '/': (context) => SplashScreen(),
+          '/login': (context) => LoginPage(),
+          '/signup': (context) => SignupPage(),
+          '/forgetPassword': (context) => ForgetPasswordPage(),
           '/home': (context) => HomeScreen(),
           '/profile': (context) => ProfileScreen(),
-          '/vehicleRegistration': (context) => const VehicleRegistrationPage(),
+          '/vehicleRegistration': (context) => VehicleRegistrationPage(),
         },
       ),
     );

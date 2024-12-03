@@ -188,4 +188,99 @@ class UserProvider extends ChangeNotifier {
       throw Exception('Failed to register vehicle');
     }
   }
+
+  List<Map<String, dynamic>> vehicles = [];
+
+  /// **Fetch User Vehicles**
+  Future<void> fetchUserVehicles() async {
+    try {
+      if (_token == null || _token!.isEmpty) {
+        throw Exception("User not authenticated");
+      }
+
+      final response = await http.get(
+        Uri.parse('$url/users/vehicles/'),
+        headers: {
+          'Authorization': 'Token $_token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      print('Raw Response: ${response.body}'); // Debugging log
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        // Check for "data" key inside the response
+        if (data is Map<String, dynamic> &&
+            data.containsKey('status') &&
+            data.containsKey('data') &&
+            data['data'] is List) {
+          vehicles = List<Map<String, dynamic>>.from(data['data']);
+        } else {
+          throw Exception("Unexpected response format");
+        }
+
+        notifyListeners();
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        throw Exception(
+            errorResponse['detail'] ?? 'Failed to fetch vehicle details');
+      }
+    } catch (e) {
+      print("Error fetching vehicle details: $e");
+      throw Exception('Failed to fetch vehicle details');
+    }
+  }
+
+  Future<void> updateVehicleDetails({
+    required int vehicleId,
+    required String vehicleNo,
+    required String company,
+    required String batteryCapacity,
+    required String chargingPortType,
+    required String chargingCapacity,
+  }) async {
+    try {
+      if (_token == null || _token!.isEmpty) {
+        throw Exception("User not authenticated");
+      }
+
+      final response = await http.patch(
+        Uri.parse(
+            '$url/users/vehicles/$vehicleId/'), // Adjust the URL based on your API
+        headers: {
+          'Authorization': 'Token $_token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'vehicle_no': vehicleNo,
+          'vehicle_company': company,
+          'battery_capacity': batteryCapacity,
+          'charging_port_type': chargingPortType,
+          'charging_capacity': chargingCapacity,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final updatedVehicle = jsonDecode(response.body);
+
+        // Update the local vehicle list
+        int vehicleIndex =
+            vehicles.indexWhere((vehicle) => vehicle['id'] == vehicleId);
+        if (vehicleIndex != -1) {
+          vehicles[vehicleIndex] = updatedVehicle;
+        }
+
+        // Notify listeners to update the UI
+        notifyListeners();
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        throw Exception(errorResponse['detail'] ?? 'Failed to update vehicle');
+      }
+    } catch (e) {
+      throw Exception('Error updating vehicle: $e');
+    }
+  }
+
 }

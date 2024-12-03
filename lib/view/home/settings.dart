@@ -1,5 +1,6 @@
 import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/view/booking_details.dart';
+import 'package:electrio/view/settings/change_password.dart';
 import 'package:electrio/view/settings/mybooking.dart';
 import 'package:electrio/view/settings/myvehicles.dart';
 import 'package:electrio/view/settings/profile_sscreen.dart';
@@ -88,7 +89,8 @@ class SettingsScreen extends StatelessWidget {
 
   // Navigate to Change Password Screen
   void _navigateToChangePassword(BuildContext context) {
-    Navigator.pushNamed(context, "/forgetPassword");
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => ChangePasswordScreen()));
   }
 
   void _navigateToMyVehicles(BuildContext context) {

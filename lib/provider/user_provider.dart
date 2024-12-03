@@ -283,4 +283,36 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    try {
+      if (_token == null || _token!.isEmpty) {
+        throw Exception("User not authenticated");
+      }
+
+      final response = await http.post(
+        Uri.parse(
+            '$url/users/change_password/'), // Replace with your actual endpoint
+        headers: {
+          'Authorization': 'Token $_token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'old_password': oldPassword,
+          'new_password': newPassword,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        notifyListeners();
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        throw Exception(errorResponse['detail'] ?? 'Failed to change password');
+      }
+    } catch (e) {
+      throw Exception('Error changing password: $e');
+    }
+  }
 }

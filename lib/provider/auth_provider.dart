@@ -38,12 +38,7 @@ class AuthProvider with ChangeNotifier {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email, 'password': password}),
       );
-      print('Request URL: $url/users/login/');
-      print('Request Headers: ${{'Content-Type': 'application/json'}}');
-      print('Request Body: ${jsonEncode({
-            'email': email,
-            'password': password
-          })}');
+      
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);

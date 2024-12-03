@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/provider/user_provider.dart';
+import 'package:electrio/view/edit_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -23,7 +24,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     try {
-      // Ensure the token is available
       final token = userProvider.token;
 
       if (token != null && token.isNotEmpty) {
@@ -58,7 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 textAlign: TextAlign.center,
               ),
             )
-          : userProvider.name.isEmpty
+          : userProvider.firstName.isEmpty && userProvider.lastName.isEmpty
               ? Center(child: CircularProgressIndicator())
               : SingleChildScrollView(
                   padding: EdgeInsets.all(20),
@@ -100,12 +100,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ? FileImage(
                                               userProvider.profileImage!)
                                           : const NetworkImage(
-                                              "https://scontent.fpkr2-1.fna.fbcdn.net/v/t39.30808-6/467311013_2890105254492263_146244950505858188_n.jpg?stp=dst-jpg_p526x296&_nc_cat=110&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeExECEUBaUDEqiv6TLY2_1TLPKFmXboweEs8oWZdujB4R1vPySO5wWdYwn03AascpAUr8mtlgwfKvqY8FjWSfdT&_nc_ohc=txqLmBcQZgwQ7kNvgGBOTkl&_nc_zt=23&_nc_ht=scontent.fpkr2-1.fna&_nc_gid=AQKExYzAz4Gq-cf9ApXUhj9&oh=00_AYBAHdsKHxmQanKahL1dRvEhPPzvak02bwsudF-m0ww9OA&oe=67531517"),
+                                              "https://scontent.fpkr2-1.fna.fbcdn.net/v/t39.30808-6/467311013_2890105254492263_146244950505858188_n.jpg?stp=dst-jpg_p526x296&_nc_cat=110&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeExECEUBaUDEqiv6TLY2_1TLPKFmXboweEs8oWZdujB4R1vPySO5wWdYwn03AascpAUr8mtlgwfKvqY8FjWSfdT&_nc_ohc=txqLmBcQZgwQ7kNvgE7VW0G&_nc_zt=23&_nc_ht=scontent.fpkr2-1.fna&_nc_gid=AYkC9mGJgMkHFy2MXoGK3Zl&oh=00_AYB2cRMQwZiL0K1MzXmPTf2wG7p6uFmo-BmYJ7Na4BtUOQ&oe=67549ED7"),
                                     ),
                                     SizedBox(width: 15),
                                     Text(
-                                      userProvider.name.isNotEmpty
-                                          ? userProvider.name
+                                      "${userProvider.firstName} ${userProvider.lastName}"
+                                              .trim()
+                                              .isNotEmpty
+                                          ? "${userProvider.firstName} ${userProvider.lastName}"
                                           : "N/A",
                                       style: const TextStyle(
                                         color: Colors.white,
@@ -135,8 +137,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             children: [
                               _buildProfileInfo(
                                   "Name",
-                                  userProvider.name.isNotEmpty
-                                      ? userProvider.name
+                                  "${userProvider.firstName} ${userProvider.lastName}"
+                                          .trim()
+                                          .isNotEmpty
+                                      ? "${userProvider.firstName} ${userProvider.lastName}"
                                       : "N/A",
                                   Icons.person),
                               _buildProfileInfo(
@@ -164,7 +168,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
-                          // Navigate to edit profile screen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => EditProfileScreen()),
+                          );
                         },
                         child: const Text("  Edit Profile  ",
                             style: TextStyle(fontSize: 18)),
@@ -184,7 +192,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Helper widget to build profile information fields
   Widget _buildProfileInfo(String label, String value, IconData icon) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12.0),

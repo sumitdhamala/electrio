@@ -6,7 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider extends ChangeNotifier {
-  String name = '';
+  String firstName = '';
+  String lastName = '';
   String email = '';
   String contact = '';
   String address = '';
@@ -35,7 +36,7 @@ class UserProvider extends ChangeNotifier {
   }) async {
     try {
       var response = await http.post(
-        Uri.parse('$url/users/register/'), // Replace with server IP
+        Uri.parse('$url/users/register/'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -56,7 +57,8 @@ class UserProvider extends ChangeNotifier {
         print("User registered: $responseData");
 
         // Save data locally
-        this.name = firstName;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.contact = contact;
         this.address = address;
@@ -77,7 +79,6 @@ class UserProvider extends ChangeNotifier {
   Future<void> fetchUserDetails() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      // Get token from shared preferences if not already set
       _token ??= prefs.getString('token');
 
       if (_token == null) throw Exception('Token missing. Please log in.');
@@ -91,7 +92,8 @@ class UserProvider extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        name = "${data['first_name']} ${data['last_name']}";
+        firstName = data['first_name'] ?? '';
+        lastName = data['last_name'] ?? '';
         email = data['email'] ?? '';
         contact = data['phone_no'] ?? '';
         address = data['address'] ?? '';
@@ -101,6 +103,83 @@ class UserProvider extends ChangeNotifier {
       }
     } catch (e) {
       print('Error fetching user details: $e');
+    }
+  }
+
+  /// **Update User Details**
+  Future<void> updateUserDetails({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String contact,
+    required String address,
+  }) async {
+    try {
+      if (_token == null || _token!.isEmpty)
+        throw Exception("User not authenticated");
+
+      final response = await http.patch(
+        Uri.parse('$url/users/me/update/'),
+        headers: {
+          'Authorization': 'Token $_token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'first_name': firstName,
+          'last_name': lastName,
+          'email': email,
+          'phone_no': contact,
+          'address': address,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        this.firstName = data['first_name'];
+        this.lastName = data['last_name'];
+        this.email = data['email'];
+        this.contact = data['phone_no'];
+        this.address = data['address'];
+        notifyListeners();
+      } else {
+        throw Exception("Failed to update user details");
+      }
+    } catch (e) {
+      print("Error updating user details: $e");
+      throw e;
+    }
+  }
+   Future<void> registerVehicle({
+    required String company,
+    required String batteryCapacity,
+    required String portType,
+    required String vehicleNo,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$url/users/vehicles/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Token $_token', // Ensure the token is set
+        },
+        body: jsonEncode({
+          'vehicle_company': company,
+          'battery_capacity': batteryCapacity,
+          'port_type': portType,
+          'vehicle_no': vehicleNo,
+          // 'charging_capacity':
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        print('Vehicle registration successful: ${response.body}');
+      } else {
+        print('Error response: ${response.body}');
+        throw Exception('Failed to register vehicle');
+      }
+    } catch (e) {
+      print('Error registering vehicle: $e');
+      throw Exception('Failed to register vehicle');
     }
   }
 }

@@ -5,6 +5,7 @@ import 'package:electrio/component/page_header.dart';
 import 'package:electrio/component/page_heading.dart';
 import 'package:electrio/provider/user_provider.dart'; // Import UserProvider
 import 'package:electrio/view/signup/loginpage.dart';
+import 'package:electrio/view/signup/vehicle_registration.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -214,7 +215,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                       const SizedBox(height: 22),
                       CustomFormButton(
-                        innerText: 'Signup',
+                        innerText: 'Next',
                         onPressed: _handleSignupUser,
                       ),
                       const SizedBox(height: 18),
@@ -268,10 +269,10 @@ class _SignupPageState extends State<SignupPage> {
 
         // Show loading indicator
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Submitting data...')),
+          const SnackBar(content: Text('Submitting user data...')),
         );
 
-        // Attempt user registration
+        // Register user
         await userProvider.registerUser(
           firstName: _firstnameController.text,
           lastName: _lastnameController.text,
@@ -283,13 +284,14 @@ class _SignupPageState extends State<SignupPage> {
           confirmPassword: _confirmPasswordController.text,
         );
 
-        // Show success message and navigate
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registration successful!')),
+        // Navigate to vehicle registration
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const VehicleRegistrationPage(),
+          ),
         );
-        Navigator.pushReplacementNamed(context, '/login');
       } catch (e) {
-        // Display error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: ${e.toString()}')),
         );

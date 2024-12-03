@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/provider/user_provider.dart';
-import 'package:electrio/view/edit_profile.dart';
+import 'package:electrio/view/settings/edit_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

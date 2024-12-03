@@ -1,7 +1,7 @@
 import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/view/booking_details.dart';
-import 'package:electrio/view/mybooking.dart';
-import 'package:electrio/view/profile_sscreen.dart';
+import 'package:electrio/view/settings/mybooking.dart';
+import 'package:electrio/view/settings/profile_sscreen.dart';
 import 'package:electrio/view/signup/forget_password.dart';
 import 'package:flutter/material.dart';
 
@@ -32,6 +32,15 @@ class SettingsScreen extends StatelessWidget {
             trailing: Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
               _navigateToChangePassword(context);
+            },
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.bookmark, color: Colors.green),
+            title: Text('My Vehicles'),
+            trailing: Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              _navigateToMyVehicles(context); // Navigate to My Bookings Screen
             },
           ),
           Divider(),
@@ -78,6 +87,10 @@ class SettingsScreen extends StatelessWidget {
 
   // Navigate to Change Password Screen
   void _navigateToChangePassword(BuildContext context) {
+    Navigator.pushNamed(context, "/forgetPassword");
+  }
+
+  void _navigateToMyVehicles(BuildContext context) {
     Navigator.pushNamed(context, "/forgetPassword");
   }
 

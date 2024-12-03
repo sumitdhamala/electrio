@@ -1,7 +1,7 @@
 import 'package:electrio/provider/auth_provider.dart';
 import 'package:electrio/provider/booking_provider.dart';
 import 'package:electrio/provider/user_provider.dart';
-import 'package:electrio/view/profile_sscreen.dart';
+import 'package:electrio/view/settings/profile_sscreen.dart';
 import 'package:electrio/view/signup/forget_password.dart';
 import 'package:electrio/view/home_screen.dart';
 import 'package:electrio/view/signup/loginpage.dart';

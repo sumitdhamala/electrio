@@ -23,6 +23,12 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> loadToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    _token = prefs.getString('token');
+    notifyListeners();
+  }
+
   /// **Register User**
   Future<void> registerUser({
     required String firstName,
@@ -37,9 +43,7 @@ class UserProvider extends ChangeNotifier {
     try {
       var response = await http.post(
         Uri.parse('$url/users/register/'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'first_name': firstName,
           'last_name': lastName,
@@ -54,23 +58,18 @@ class UserProvider extends ChangeNotifier {
 
       if (response.statusCode == 201) {
         final responseData = jsonDecode(response.body);
-        print("User registered: $responseData");
 
-        // Save data locally
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.contact = contact;
-        this.address = address;
+        // Save token
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', responseData['token']);
+        setToken(responseData['token']); // Update the provider token
 
         notifyListeners();
       } else {
         final errorResponse = jsonDecode(response.body);
-        print('Error Response: $errorResponse');
         throw Exception(errorResponse['detail'] ?? 'Unknown error occurred');
       }
     } catch (e) {
-      print('Exception: $e');
       throw Exception('Failed to register user: $e');
     }
   }
@@ -149,27 +148,34 @@ class UserProvider extends ChangeNotifier {
       throw e;
     }
   }
-   Future<void> registerVehicle({
+
+  Future<void> registerVehicle({
     required String company,
     required String batteryCapacity,
     required String portType,
     required String vehicleNo,
+    required String chargingCapacity,
   }) async {
     try {
       final response = await http.post(
         Uri.parse('$url/users/vehicles/'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Token $_token', // Ensure the token is set
+          'Authorization': 'Token $_token',
         },
         body: jsonEncode({
           'vehicle_company': company,
           'battery_capacity': batteryCapacity,
-          'port_type': portType,
+          'charging_port_type': portType,
           'vehicle_no': vehicleNo,
-          // 'charging_capacity':
+          'charging_capacity': chargingCapacity
         }),
       );
+      print('Token in registerVehicle: $_token');
+      print('Headers: ${{
+        'Content-Type': 'application/json',
+        'Authorization': 'Token $_token',
+      }}');
 
       if (response.statusCode == 201) {
         print('Vehicle registration successful: ${response.body}');

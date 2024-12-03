@@ -12,6 +12,7 @@ class VehicleRegistrationPage extends StatefulWidget {
       _VehicleRegistrationPageState();
 }
 
+@override
 class _VehicleRegistrationPageState extends State<VehicleRegistrationPage> {
   final _vehicleFormKey = GlobalKey<FormState>();
 
@@ -19,9 +20,16 @@ class _VehicleRegistrationPageState extends State<VehicleRegistrationPage> {
   final _companyController = TextEditingController();
   final _batteryCapacityController = TextEditingController();
   final _vehicleNoController = TextEditingController();
+  final _chargingCapacityController = TextEditingController();
 
   // Dropdown for Port Type
   String? _selectedPortType;
+  @override
+  void initState() {
+    super.initState();
+    // Ensure token is loaded
+    Provider.of<UserProvider>(context, listen: false).loadToken();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +74,18 @@ class _VehicleRegistrationPageState extends State<VehicleRegistrationPage> {
                   },
                 ),
                 const SizedBox(height: 16),
+                CustomInputField(
+                  labelText: 'Charging Capacity',
+                  hintText: 'Enter Charging capacity',
+                  controller: _chargingCapacityController,
+                  validator: (textValue) {
+                    if (textValue == null || textValue.isEmpty) {
+                      return 'Charging capacity is required!';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: DropdownButtonFormField<String>(
@@ -78,7 +98,11 @@ class _VehicleRegistrationPageState extends State<VehicleRegistrationPage> {
                       fillColor: Colors.white,
                     ),
                     value: _selectedPortType,
-                    items: ['CCS1','CCS2', 'GB/T',]
+                    items: [
+                      'CCS1',
+                      'CCS2',
+                      'GB/T',
+                    ]
                         .map((portType) => DropdownMenuItem(
                               value: portType,
                               child: Text(portType),
@@ -138,6 +162,7 @@ class _VehicleRegistrationPageState extends State<VehicleRegistrationPage> {
           batteryCapacity: _batteryCapacityController.text,
           portType: _selectedPortType!,
           vehicleNo: _vehicleNoController.text,
+          chargingCapacity: _chargingCapacityController.text,
         );
 
         // Show success message and navigate to login

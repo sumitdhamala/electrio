@@ -4,8 +4,8 @@ import 'package:electrio/component/custom_textfield.dart';
 import 'package:electrio/component/page_header.dart';
 import 'package:electrio/component/page_heading.dart';
 import 'package:electrio/provider/user_provider.dart'; // Import UserProvider
+import 'package:electrio/view/signup/email_verification.dart';
 import 'package:electrio/view/signup/loginpage.dart';
-import 'package:electrio/view/signup/vehicle_registration.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -288,7 +288,7 @@ class _SignupPageState extends State<SignupPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const VehicleRegistrationPage(),
+            builder: (context) => const EmailVerificationScreen(),
           ),
         );
       } catch (e) {

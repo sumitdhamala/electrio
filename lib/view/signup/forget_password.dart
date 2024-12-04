@@ -2,9 +2,12 @@ import 'package:electrio/component/custom_form_button.dart';
 import 'package:electrio/component/custom_textfield.dart';
 import 'package:electrio/component/page_header.dart';
 import 'package:electrio/component/page_heading.dart';
+import 'package:electrio/view/signup/forget_pss_confirmation.dart';
 import 'package:electrio/view/signup/loginpage.dart';
-import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:email_validator/email_validator.dart';
+import 'package:provider/provider.dart';
+import 'package:electrio/provider/user_provider.dart';
 
 class ForgetPasswordPage extends StatefulWidget {
   const ForgetPasswordPage({Key? key}) : super(key: key);
@@ -15,6 +18,47 @@ class ForgetPasswordPage extends StatefulWidget {
 
 class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
   final _forgetPasswordFormKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleForgetPassword() async {
+    if (_forgetPasswordFormKey.currentState!.validate()) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+      // Show loading indicator
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Submitting data...')),
+      );
+
+      try {
+        // Call the forget password API
+        await userProvider.resetPassword(email: _emailController.text);
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Reset password email sent successfully')),
+        );
+
+        // Navigate to Login Page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const ResetPasswordConfirmationPage()),
+        );
+      } catch (e) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +71,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
               alignment: Alignment.topLeft,
               child: IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: Icon(Icons.arrow_back)),
+                  icon: const Icon(Icons.arrow_back)),
             ),
             const PageHeader(),
             Expanded(
@@ -44,21 +88,23 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
                     child: Column(
                       children: [
                         const PageHeading(
-                          title: 'Forgot password',
+                          title: 'Forgot Password',
                         ),
                         CustomInputField(
-                            labelText: 'Email',
-                            hintText: 'Your email id',
-                            isDense: true,
-                            validator: (textValue) {
-                              if (textValue == null || textValue.isEmpty) {
-                                return 'Email is required!';
-                              }
-                              if (!EmailValidator.validate(textValue)) {
-                                return 'Please enter a valid email';
-                              }
-                              return null;
-                            }),
+                          labelText: 'Email',
+                          hintText: 'Your email id',
+                          isDense: true,
+                          controller: _emailController,
+                          validator: (textValue) {
+                            if (textValue == null || textValue.isEmpty) {
+                              return 'Email is required!';
+                            }
+                            if (!EmailValidator.validate(textValue)) {
+                              return 'Please enter a valid email';
+                            }
+                            return null;
+                          },
+                        ),
                         const SizedBox(
                           height: 20,
                         ),
@@ -69,25 +115,6 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
                         const SizedBox(
                           height: 20,
                         ),
-                        // Container(
-                        //   alignment: Alignment.center,
-                        //   child: GestureDetector(
-                        //     onTap: () => {
-                        //       Navigator.push(
-                        //           context,
-                        //           MaterialPageRoute(
-                        //               builder: (context) => const LoginPage()))
-                        //     },
-                        //     child: const Text(
-                        //       'Back to login',
-                        //       style: TextStyle(
-                        //         fontSize: 13,
-                        //         color: Colors.green,
-                        //         fontWeight: FontWeight.bold,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
                       ],
                     ),
                   ),
@@ -98,14 +125,5 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
         ),
       ),
     );
-  }
-
-  void _handleForgetPassword() {
-    // forget password
-    if (_forgetPasswordFormKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Submitting data..')),
-      );
-    }
   }
 }

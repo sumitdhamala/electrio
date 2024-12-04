@@ -349,4 +349,47 @@ class UserProvider extends ChangeNotifier {
       throw Exception('Error verifying OTP: $e');
     }
   }
+
+  Future<void> resetPassword({required String email}) async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+            '$url/users/send_reset_password/'), // Replace with your endpoint
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to send reset password email');
+      }
+    } catch (e) {
+      throw Exception('Error sending reset password email: $e');
+    }
+  }
+
+  Future<void> confirmResetPassword({
+    required String email,
+    required String otp,
+    required String password,
+    required String confirmPassword,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$url/users/reset_password/'), // Replace with your endpoint
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+          'otp': otp,
+          'new_password': password,
+          'confirm_password': confirmPassword,
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to reset password');
+      }
+    } catch (e) {
+      throw Exception('Error resetting password: $e');
+    }
+  }
 }

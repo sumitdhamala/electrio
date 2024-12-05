@@ -1,175 +1,183 @@
-import 'package:electrio/model/station_model.dart';
-import 'package:electrio/view/reservation_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:electrio/model/station_model.dart';
 
 class StationDetailSheet extends StatelessWidget {
   final Station station;
 
-  const StationDetailSheet({Key? key, required this.station}) : super(key: key);
+  StationDetailSheet({required this.station});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 50,
-              height: 5,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(10),
+    // Use FutureBuilder if the data is coming asynchronously
+    return FutureBuilder<Station>(
+      future:
+          _fetchStationDetails(), // Replace with the function to fetch station details
+      builder: (context, snapshot) {
+        // Handle loading state
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        // Handle error state
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+
+        // Handle successful state
+        if (snapshot.hasData) {
+          Station station = snapshot.data!; // Get the station data
+          return Padding(
+            padding:
+                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Station Name
+                  Text(
+                    station.name,
+                    style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                  SizedBox(height: 10),
+
+                  // Location
+                  Row(
+                    children: [
+                      Icon(Icons.location_on, color: Colors.green),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          station.location,
+                          style:
+                              TextStyle(fontSize: 16, color: Colors.grey[700]),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+
+                  // Status
+                  Row(
+                    children: [
+                      Icon(Icons.info_outline, color: Colors.blue),
+                      SizedBox(width: 8),
+                      Text(
+                        'Status: ${station.status == 'OP' ? 'Open' : 'Closed'}',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+
+                  // Charger Types
+                  Row(
+                    children: [
+                      Icon(Icons.bolt, color: Colors.orange),
+                      SizedBox(width: 8),
+                      Text(
+                        'Charger Types: ${station.chargerTypes.length}',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+
+                  // Total Slots Section
+                  Row(
+                    children: [
+                      Icon(Icons.local_parking, color: Colors.blueGrey),
+                      SizedBox(width: 8),
+                      Text(
+                        'Total Slots: ${station.totalSlots}',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+
+                  // Facilities Section
+                  Text(
+                    'Facilities:',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  _buildFacilities(station),
+                ],
               ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  'https://via.placeholder.com/100', // Replace with actual image URL
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      station.name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      station.address,
-                      style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                    ),
-                    const SizedBox(height: 8),
-                    GestureDetector(
-                      onTap: () {
-                        // Add contact functionality here
-                      },
-                      child: Row(
-                        children: [
-                          Icon(Icons.phone,
-                              color: Colors.green.shade600), // Changed to green
-                          const SizedBox(width: 4),
-                          Text(
-                            'Contact Station',
-                            style: TextStyle(
-                                color:
-                                    Colors.green.shade600), // Changed to green
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.favorite_border,
-                color: Colors.redAccent,
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Plugs',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(Icons.power_outlined,
-                          color: Colors.green), // Changed to green
-                      const SizedBox(width: 4),
-                      const Text('CCS2 - 7.2Kw AC'),
-                    ],
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Amenities',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(Icons.local_parking,
-                          color: Colors.green), // Changed to green
-                      const SizedBox(width: 8),
-                      Icon(Icons.wc, color: Colors.green), // Changed to green
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  // Add get direction functionality
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green, // Changed to green
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                ),
-                child: const Text(
-                  'Get Direction',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              OutlinedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ReservationScreen(station: station),
-                    ),
-                  );
-                },
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.green,
-                  side: BorderSide(color: Colors.green), // Changed to green
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                ),
-                child: const Text('Book Now'),
-              ),
-            ],
-          ),
+          );
+        }
+
+        // If no data
+        return Center(child: Text('No data available'));
+      },
+    );
+  }
+
+  // Function to fetch station details (just an example)
+  Future<Station> _fetchStationDetails() async {
+    // Simulate fetching data from an API or database
+    await Future.delayed(Duration(seconds: 2)); // simulate delay
+
+    // Return a mock station for the example
+    return Station(
+      name: 'Pokhara Station',
+      location: 'Pokhara123',
+      status: 'OP',
+      chargerTypes: [1],
+      totalSlots: 1,
+      hasHotels: true,
+      hasRestaurants: true,
+      hasWifi: false,
+      hasParking: false,
+      hasRestrooms: false,
+    );
+  }
+
+  // Widget to build the facilities list
+  Widget _buildFacilities(Station station) {
+    List<Widget> facilities = [];
+
+    if (station.hasHotels) {
+      facilities.add(_buildFacilityChip('Hotels', Icons.hotel, Colors.blue));
+    }
+    if (station.hasRestaurants) {
+      facilities.add(
+          _buildFacilityChip('Restaurants', Icons.restaurant, Colors.orange));
+    }
+    if (station.hasWifi) {
+      facilities.add(_buildFacilityChip('Wi-Fi', Icons.wifi, Colors.green));
+    }
+    if (station.hasParking) {
+      facilities
+          .add(_buildFacilityChip('Parking', Icons.local_parking, Colors.red));
+    }
+    if (station.hasRestrooms) {
+      facilities.add(_buildFacilityChip('Restrooms', Icons.wc, Colors.purple));
+    }
+
+    return Wrap(
+      spacing: 8.0,
+      children: facilities,
+    );
+  }
+
+  Widget _buildFacilityChip(String label, IconData icon, Color color) {
+    return Chip(
+      label: Row(
+        children: [
+          Icon(icon, color: color, size: 18),
+          SizedBox(width: 5),
+          Text(label),
         ],
       ),
+      backgroundColor: color.withOpacity(0.1),
+      labelStyle: TextStyle(color: color),
     );
   }
 }

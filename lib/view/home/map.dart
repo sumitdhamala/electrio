@@ -1,10 +1,11 @@
-import 'dart:convert';
-
+import 'package:electrio/component/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:async';
+import 'package:geolocator/geolocator.dart';
 
 class HomeView extends StatefulWidget {
   @override
@@ -12,447 +13,316 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  LatLng _currentLocation = LatLng(28.2096, 83.9856);
-  LatLng? _destinationLocation;
-  String _destinationName = '';
-  final TextEditingController _searchController = TextEditingController();
   final MapController _mapController = MapController();
-  double _currentZoom = 17.0;
-  List<dynamic> _suggestions = [];
-  List<LatLng> _mainRoutePoints = [];
-  List<List<LatLng>> _alternativeRoutePoints = [];
-  String _selectedRide = 'Bike'; // Default to 'Bike'
-  bool _rideStarted = false; // Track if the ride has started
-  bool _isSearchBarVisible = true; // Flag to manage search bar visibility
-  bool _isStartRideVisible =
-      true; // Flag to manage start ride button visibility
-
-  Future<void> _getCurrentLocation() async {
-    try {
-      LocationPermission permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.whileInUse ||
-          permission == LocationPermission.always) {
-        Position position = await Geolocator.getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.high);
-        setState(() {
-          _currentLocation = LatLng(position.latitude, position.longitude);
-          _mapController.move(_currentLocation, _currentZoom);
-        });
-      }
-    } catch (e) {
-      print('Error getting current location: $e');
-    }
-  }
-
-  Future<void> _searchPlace(String query) async {
-    if (query.isEmpty) return;
-    try {
-      String simplifiedQuery = query.split(',').first;
-      final response = await http.get(Uri.parse(
-          'https://nominatim.openstreetmap.org/search?q=$simplifiedQuery,Nepal&format=json&addressdetails=1&limit=5'));
-      if (response.statusCode == 200) {
-        List<dynamic> jsonResponse = json.decode(response.body);
-        setState(() {
-          _suggestions = jsonResponse;
-        });
-      } else {
-        print('Error fetching suggestions: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error fetching suggestions: $e');
-    }
-  }
-
-  void _updateMap(String place) async {
-    try {
-      String simplifiedPlace = place.split(',')[0];
-      final response = await http.get(Uri.parse(
-          'https://nominatim.openstreetmap.org/search?q=$simplifiedPlace,Nepal&format=json&addressdetails=1&limit=1'));
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonResponse = json.decode(response.body);
-        if (jsonResponse.isNotEmpty) {
-          final location = jsonResponse[0];
-          setState(() {
-            _destinationLocation = LatLng(
-                double.parse(location['lat']), double.parse(location['lon']));
-            _destinationName = location['display_name'];
-            _mapController.move(_destinationLocation!, _currentZoom);
-            _suggestions.clear();
-            _searchController.clear();
-            _drawRoute();
-            _isSearchBarVisible =
-                false; // Hide search bar after successful search
-            _isStartRideVisible = true; // Show start ride button
-            _selectedRide = 'Bike'; // Automatically select bike ride
-          });
-        } else {
-          print('No location found for: $place');
-        }
-      } else {
-        print('Error fetching location: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error updating map: $e');
-    }
-  }
-
-  Future<void> _drawRoute() async {
-    if (_destinationLocation != null) {
-      final url = 'https://router.project-osrm.org/route/v1/driving/'
-          '${_currentLocation.longitude},${_currentLocation.latitude};'
-          '${_destinationLocation!.longitude},${_destinationLocation!.latitude}'
-          '?geometries=geojson&alternatives=2';
-
-      try {
-        final response =
-            await http.get(Uri.parse(url)).timeout(Duration(seconds: 15));
-        if (response.statusCode == 200) {
-          final jsonResponse = json.decode(response.body);
-          // Process the routes here...
-        } else {
-          print('Error fetching routes: ${response.statusCode}');
-        }
-      } catch (e) {
-        print('Error drawing routes: $e');
-      }
-    } else {
-      print('Destination location is null');
-    }
-  }
-
-  void _startRide() {
-    setState(() {
-      _rideStarted = true; // Mark ride as started
-      _isStartRideVisible = false; // Hide start ride button
-    });
-  }
-
-  void _cancelRide() {
-    setState(() {
-      _rideStarted = false; // Reset the ride status
-      _destinationLocation = null; // Clear the destination
-      _destinationName = ''; // Clear the destination name
-      _selectedRide = 'Bike'; // Reset the selected ride to 'Bike'
-      _suggestions.clear(); // Clear any suggestions
-      _searchController.clear(); // Clear the search field
-      _isSearchBarVisible = true; // Show search bar again
-      _isStartRideVisible = true; // Show start ride button again
-    });
-  }
-
-  void _selectRide(String ride) {
-    setState(() {
-      _selectedRide = ride;
-    });
-  }
+  LatLng _currentLocation = LatLng(28.2096, 83.9856); // Default location
+  List<Map<String, dynamic>> _chargingStations = [];
+  LatLng? _selectedStationLocation;
+  String? _routeSummary;
+  List<LatLng> _routePoints = [];
+  Timer? _statusRefreshTimer;
 
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
-    _selectedRide = 'Bike';
+    _fetchChargingStations();
+    _startStatusRefreshTimer();
+    _getUserLocation();
+  }
+
+  @override
+  void dispose() {
+    _statusRefreshTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _fetchChargingStations() async {
+    try {
+      final response = await http.get(Uri.parse('$url/reserve/stations/'));
+      if (response.statusCode == 200) {
+        setState(() {
+          _chargingStations =
+              List<Map<String, dynamic>>.from(json.decode(response.body));
+        });
+      } else {
+        throw Exception('Failed to fetch charging stations');
+      }
+    } catch (e) {
+      print('Error fetching charging stations: $e');
+    }
+  }
+
+  void _startStatusRefreshTimer() {
+    _statusRefreshTimer = Timer.periodic(Duration(minutes: 5), (timer) {
+      _fetchChargingStations();
+    });
+  }
+
+  Future<void> _getUserLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Check if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      print('Location services are disabled.');
+      return;
+    }
+
+    // Check for location permission
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        print('Location permissions are denied');
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      print('Location permissions are permanently denied');
+      return;
+    }
+
+    // Get the current position of the user
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    setState(() {
+      _currentLocation = LatLng(position.latitude, position.longitude);
+    });
+  }
+
+  Future<void> _getRouteToStation(LatLng destination) async {
+    final url = 'https://router.project-osrm.org/route/v1/driving/'
+        '${_currentLocation.longitude},${_currentLocation.latitude};'
+        '${destination.longitude},${destination.latitude}?geometries=geojson';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final route = data['routes'][0];
+        setState(() {
+          _routePoints = decodePolyline(route['geometry']['coordinates']);
+          _routeSummary =
+              '${(route['distance'] / 1000).toStringAsFixed(2)} km, '
+              '${(route['duration'] / 60).toStringAsFixed(0)} min';
+        });
+      }
+    } catch (e) {
+      print('Error fetching route: $e');
+    }
+  }
+
+  List<LatLng> decodePolyline(List<dynamic> coordinates) {
+    return coordinates.map((coord) => LatLng(coord[1], coord[0])).toList();
+  }
+
+  Widget _buildPopupContent(Map<String, dynamic> station) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Station Name
+        Text(
+          station['station_name'],
+          style: TextStyle(
+              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+        ),
+        SizedBox(height: 8),
+
+        // Location
+        Text(
+          'Location: ${station['station_location']}',
+          style: TextStyle(color: Colors.grey),
+        ),
+        SizedBox(height: 8),
+
+        // Charger Types and Slots
+        Row(
+          children: [
+            // Total Slots
+            Chip(
+              label: Text('Slots: ${station['total_slots']}'),
+              backgroundColor: Colors.green.shade100,
+              avatar: Icon(Icons.battery_charging_full, size: 16),
+            ),
+            SizedBox(width: 8),
+            // Charger Types
+            Chip(
+              label:
+                  Text('Charger Types: ${station['charger_types'].join(", ")}'),
+              backgroundColor: Colors.green.shade100,
+              avatar: Icon(Icons.power, size: 16),
+            ),
+          ],
+        ),
+        SizedBox(height: 8),
+
+        // Amenities with Icons
+        Wrap(
+          spacing: 8.0,
+          children: [
+            if (station['has_wifi'])
+              Chip(
+                label: Text('Wi-Fi'),
+                avatar: Icon(Icons.wifi, size: 16),
+                backgroundColor: Colors.green.shade100,
+              ),
+            if (station['has_parking'])
+              Chip(
+                label: Text('Parking'),
+                avatar: Icon(Icons.local_parking, size: 16),
+                backgroundColor: Colors.green.shade100,
+              ),
+            if (station['has_restrooms'])
+              Chip(
+                label: Text('Restrooms'),
+                avatar: Icon(Icons.wc, size: 16),
+                backgroundColor: Colors.green.shade100,
+              ),
+            if (station['has_restaurants'])
+              Chip(
+                label: Text('Restaurant'),
+                avatar: Icon(Icons.restaurant, size: 16),
+                backgroundColor: Colors.green.shade100,
+              ),
+          ],
+        ),
+        SizedBox(height: 8),
+
+        // Get Directions Button
+        ElevatedButton.icon(
+          onPressed: () {
+            final destination = LatLng(
+              double.parse(station['station_latitude']),
+              double.parse(station['station_longitude']),
+            );
+            _getRouteToStation(destination);
+
+            // Close the popup by setting _selectedStationLocation to null
+            setState(() {
+              _selectedStationLocation = null;
+            });
+          },
+          icon: Icon(Icons.directions),
+          label: Text('Get Directions'),
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+        ),
+        if (_routeSummary != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text('Route: $_routeSummary',
+                style: TextStyle(color: Colors.grey)),
+          ),
+        SizedBox(height: 8),
+
+        // Cancel Button
+        TextButton(
+          onPressed: () {
+            setState(() {
+              _selectedStationLocation = null; // Dismiss the popup
+            });
+          },
+          child: Text('Cancel', style: TextStyle(color: Colors.red)),
+        ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: Icon(Icons.menu, color: Colors.black),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            );
-          },
-        ),
-        title: Text('Home', style: TextStyle(color: Colors.black)),
-      ),
-      // drawer: AppDrawer(),
+          title: Text('Charging Stations'), backgroundColor: Colors.green),
       body: Stack(
         children: [
           FlutterMap(
             mapController: _mapController,
             options: MapOptions(
               initialCenter: _currentLocation,
-              initialZoom: _currentZoom,
+              initialZoom: 13.0,
+              onTap: (_, __) => setState(() => _selectedStationLocation = null),
             ),
             children: [
               TileLayer(
                 urlTemplate:
                     "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                userAgentPackageName: 'com.example.app',
+                subdomains: ['a', 'b', 'c'],
               ),
               MarkerLayer(
                 markers: [
+                  // User Location Marker
                   Marker(
-                    width: 80.0,
-                    height: 80.0,
+                    width: 40,
+                    height: 40,
                     point: _currentLocation,
                     child: Icon(
-                      Icons.place,
-                      color: Colors.red,
-                      size: 40.0,
+                      Icons.location_on,
+                      color: Colors.green,
+                      size: 40,
                     ),
                   ),
-                  if (_destinationLocation != null)
-                    Marker(
-                      width: 80.0,
-                      height: 80.0,
-                      point: _destinationLocation!,
-                      child: Icon(
-                        Icons.place,
-                        color: Colors.blue,
-                        size: 40.0,
+                  // Charging Station Markers
+                  ..._chargingStations.map((station) {
+                    final stationLocation = LatLng(
+                      double.parse(station['station_latitude']),
+                      double.parse(station['station_longitude']),
+                    );
+                    return Marker(
+                      width: 80,
+                      height: 80,
+                      point: stationLocation,
+                      child: GestureDetector(
+                        onTap: () => setState(
+                            () => _selectedStationLocation = stationLocation),
+                        child: Icon(Icons.ev_station,
+                            color: Colors.green, size: 40),
                       ),
-                    ),
+                    );
+                  }).toList(),
+                ],
+              ),
+              PolylineLayer(
+                polylines: [
+                  Polyline(
+                    points: _routePoints,
+                    strokeWidth: 4.0,
+                    color: Colors.green,
+                  ),
                 ],
               ),
             ],
           ),
-          if (_isSearchBarVisible)
-            Positioned(
-              bottom: 20.0,
-              left: 0,
-              right: 0,
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.05),
+          if (_selectedStationLocation != null)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Card(
+                margin: EdgeInsets.all(16.0),
+                color: Colors.grey.shade100,
                 child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 10.0,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: _searchController,
-                                decoration: InputDecoration(
-                                  hintText: 'Enter destination',
-                                ),
-                                onChanged: (value) {
-                                  if (value.isNotEmpty) {
-                                    _searchPlace(value);
-                                  }
-                                },
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.search),
-                              onPressed: _onSearch,
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (_suggestions.isNotEmpty)
-                        Container(
-                          height: 150.0,
-                          child: ListView.builder(
-                            itemCount: _suggestions.length,
-                            itemBuilder: (context, index) {
-                              final suggestion =
-                                  _suggestions[index]['display_name'];
-                              return ListTile(
-                                title: Text(suggestion),
-                                onTap: () {
-                                  _updateMap(suggestion);
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                    ],
-                  ),
+                  width: double.infinity,
+                  constraints: BoxConstraints(maxHeight: 350), // Smaller popup
+                  padding: EdgeInsets.all(16.0),
+                  child: _buildPopupContent(
+                      _chargingStations.firstWhere((station) =>
+                          LatLng(
+                            double.parse(station['station_latitude']),
+                            double.parse(station['station_longitude']),
+                          ) ==
+                          _selectedStationLocation)),
                 ),
               ),
             ),
-          if (_destinationLocation != null)
-            Positioned(
-              bottom: 20.0,
-              left: 0,
-              right: 0,
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.05),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 10.0,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('From: Your Location'),
-                            Text('To: $_destinationName'),
-                            Text(
-                                'Distance: ${calculateDistance(_currentLocation, _destinationLocation!)} km'),
-                            SizedBox(height: 10),
-                            if (_isStartRideVisible)
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: _startRide,
-                                    child: Text('Start Ride'),
-                                  ),
-                                ],
-                              ),
-                            if (_rideStarted)
-                              Column(
-                                children: [
-                                  Text('Select a Ride:'),
-                                  SizedBox(height: 10),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          _selectRide('Bike');
-                                        },
-                                        child: Stack(
-                                          children: [
-                                            Image.asset(
-                                              'assets/bike.png',
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.15,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.15,
-                                            ),
-                                            if (_selectedRide == 'Bike')
-                                              Positioned(
-                                                right: 0,
-                                                child: Icon(Icons.check_circle,
-                                                    color: Colors.green),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          _selectRide('Car');
-                                        },
-                                        child: Stack(
-                                          children: [
-                                            Image.asset(
-                                              'assets/car.png',
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.15,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.15,
-                                            ),
-                                            if (_selectedRide == 'Car')
-                                              Positioned(
-                                                right: 0,
-                                                child: Icon(Icons.check_circle,
-                                                    color: Colors.green),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 10),
-                                  if (_selectedRide.isNotEmpty)
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        ElevatedButton(
-                                          onPressed:
-                                              _findDriver, // Trigger driver search
-                                          child: Text('Find Driver'),
-                                        ),
-                                        SizedBox(width: 20),
-                                        ElevatedButton(
-                                          onPressed: _rideStarted
-                                              ? _cancelRide
-                                              : null, // Enable/disable based on ride status
-                                          child: Text('Cancel Ride'),
-                                        ),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+          Positioned(
+            bottom: 16.0,
+            right: 16.0,
+            child: FloatingActionButton(
+              backgroundColor: Colors.green,
+              onPressed: () => _mapController.move(_currentLocation, 13.0),
+              child: Icon(Icons.my_location, color: Colors.white),
             ),
+          ),
         ],
       ),
     );
-  }
-
-  double calculateDistance(LatLng start, LatLng end) {
-    final distance = Geolocator.distanceBetween(
-        start.latitude, start.longitude, end.latitude, end.longitude);
-    return double.parse(
-        (distance / 1000).toStringAsFixed(2)); // Return as double
-  }
-
-  void _onSearch() {
-    if (_searchController.text.isNotEmpty) {
-      _updateMap(_searchController.text);
-    }
-  }
-
-  Future<void> _findDriver() async {
-    // Check if a ride is selected
-    if (_selectedRide.isEmpty) {
-      print('No ride selected. Please select a ride.');
-      return; // Exit the method if no ride is selected
-    }
-
-    // Print the current and destination locations along with the selected ride
-    print(
-        'Ride started from ${_currentLocation.toString()} to ${_destinationLocation.toString()} with $_selectedRide');
-
-    // Navigate to the WaitingForDriverScreen
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => WaitingForDriverScreen()),
-    // );
-
-    // Implement driver search logic here
-    print('Finding driver for $_selectedRide');
   }
 }

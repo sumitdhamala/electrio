@@ -1,31 +1,48 @@
+import 'dart:convert';
+
+import 'package:electrio/component/constants/constants.dart';
+import 'package:electrio/view/reservation_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:electrio/model/station_model.dart';
+import 'package:http/http.dart' as http;
 
 class StationDetailSheet extends StatelessWidget {
   final Station station;
 
   StationDetailSheet({required this.station});
 
+  Future<Station> _fetchStationDetails(int stationId) async {
+    try {
+      final response =
+          await http.get(Uri.parse("$url/reserve/stations/$stationId/"));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+
+        return Station.fromJson(jsonData);
+      } else {
+        throw Exception('Failed to load station details');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Use FutureBuilder if the data is coming asynchronously
     return FutureBuilder<Station>(
-      future:
-          _fetchStationDetails(), // Replace with the function to fetch station details
+      future: _fetchStationDetails(station.id), // Pass station ID dynamically
       builder: (context, snapshot) {
-        // Handle loading state
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         }
 
-        // Handle error state
         if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         }
 
-        // Handle successful state
         if (snapshot.hasData) {
-          Station station = snapshot.data!; // Get the station data
+          Station station = snapshot.data!;
           return Padding(
             padding:
                 const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
@@ -33,7 +50,6 @@ class StationDetailSheet extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Station Name
                   Text(
                     station.name,
                     style: TextStyle(
@@ -42,8 +58,6 @@ class StationDetailSheet extends StatelessWidget {
                         color: Colors.black),
                   ),
                   SizedBox(height: 10),
-
-                  // Location
                   Row(
                     children: [
                       Icon(Icons.location_on, color: Colors.green),
@@ -59,22 +73,18 @@ class StationDetailSheet extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 20),
-
-                  // Status
                   Row(
                     children: [
                       Icon(Icons.info_outline, color: Colors.blue),
                       SizedBox(width: 8),
                       Text(
-                        'Status: ${station.status == 'OP' ? 'Open' : 'Closed'}',
+                        'Status: ${_getStatusText(station.status)}',
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
                   SizedBox(height: 20),
-
-                  // Charger Types
                   Row(
                     children: [
                       Icon(Icons.bolt, color: Colors.orange),
@@ -86,8 +96,6 @@ class StationDetailSheet extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 20),
-
-                  // Total Slots Section
                   Row(
                     children: [
                       Icon(Icons.local_parking, color: Colors.blueGrey),
@@ -99,47 +107,39 @@ class StationDetailSheet extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 20),
-
-                  // Facilities Section
                   Text(
                     'Facilities:',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 10),
                   _buildFacilities(station),
+                  SizedBox(height: 20),
+                  _buildActionButtons(context),
                 ],
               ),
             ),
           );
         }
 
-        // If no data
         return Center(child: Text('No data available'));
       },
     );
   }
 
-  // Function to fetch station details (just an example)
-  Future<Station> _fetchStationDetails() async {
-    // Simulate fetching data from an API or database
-    await Future.delayed(Duration(seconds: 2)); // simulate delay
-
-    // Return a mock station for the example
-    return Station(
-      name: 'Pokhara Station',
-      location: 'Pokhara123',
-      status: 'OP',
-      chargerTypes: [1],
-      totalSlots: 1,
-      hasHotels: true,
-      hasRestaurants: true,
-      hasWifi: false,
-      hasParking: false,
-      hasRestrooms: false,
-    );
+  /// Map status codes to human-readable text
+  String _getStatusText(String status) {
+    switch (status) {
+      case 'OP':
+        return 'Open';
+      case 'CL':
+        return 'Closed';
+      case 'UM':
+        return 'Under Maintenance';
+      default:
+        return 'Unknown';
+    }
   }
 
-  // Widget to build the facilities list
   Widget _buildFacilities(Station station) {
     List<Widget> facilities = [];
 
@@ -178,6 +178,45 @@ class StationDetailSheet extends StatelessWidget {
       ),
       backgroundColor: color.withOpacity(0.1),
       labelStyle: TextStyle(color: color),
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      color: Colors.grey[200],
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              print('Get Directions');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+            child: Text(
+              'Get Directions',
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ReservationScreen(station: station)));
+              print('Book Now');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+            child: Text(
+              'Book Now',
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

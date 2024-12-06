@@ -2,10 +2,10 @@ import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/model/booking_model.dart';
 import 'package:electrio/model/station_model.dart';
 import 'package:electrio/view/booking_details.dart';
-import 'package:electrio/provider/booking_provider.dart'; 
+import 'package:electrio/provider/booking_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart'; 
+import 'package:provider/provider.dart';
 
 class ReservationScreen extends StatefulWidget {
   final Station station;
@@ -18,9 +18,10 @@ class ReservationScreen extends StatefulWidget {
 
 class _ReservationScreenState extends State<ReservationScreen> {
   DateTime? selectedDate;
-  TimeOfDay? selectedTime;
+  TimeOfDay? startTime;
+  TimeOfDay? endTime;
   String? selectedPortType;
-  final List<String> portTypes = ['CCS2', 'CHAdeMO', 'Type 2'];
+  final List<String> portTypes = ['CCS1', 'CCS2', 'GB/T'];
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -32,8 +33,8 @@ class _ReservationScreenState extends State<ReservationScreen> {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: ColorScheme.light(
-              primary: Colors.green, // Selected date color
-              onPrimary: Colors.white, // Text on selected date
+              primary: Colors.green,
+              onPrimary: Colors.white,
             ),
             dialogBackgroundColor: Colors.white,
           ),
@@ -48,7 +49,8 @@ class _ReservationScreenState extends State<ReservationScreen> {
     }
   }
 
-  Future<void> _selectTime(BuildContext context) async {
+  Future<void> _selectTime(BuildContext context,
+      {required bool isStartTime}) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -56,9 +58,9 @@ class _ReservationScreenState extends State<ReservationScreen> {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: ColorScheme.light(
-              primary: Colors.green, 
-              onPrimary: Colors.white, 
-              onSurface: Colors.green, 
+              primary: Colors.green,
+              onPrimary: Colors.white,
+              onSurface: Colors.green,
             ),
             dialogBackgroundColor: Colors.white,
           ),
@@ -66,9 +68,13 @@ class _ReservationScreenState extends State<ReservationScreen> {
         );
       },
     );
-    if (picked != null && picked != selectedTime) {
+    if (picked != null) {
       setState(() {
-        selectedTime = picked;
+        if (isStartTime) {
+          startTime = picked;
+        } else {
+          endTime = picked;
+        }
       });
     }
   }
@@ -94,9 +100,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
                     ? 'Select Date'
                     : DateFormat.yMMMd().format(selectedDate!),
                 style: TextStyle(
-                    color: selectedDate == null
-                        ? Colors.black
-                        : Colors.green), // Change text color
+                    color: selectedDate == null ? Colors.black : Colors.green),
               ),
               trailing: Icon(Icons.arrow_drop_down, color: Colors.green),
               onTap: () => _selectDate(context),
@@ -104,16 +108,24 @@ class _ReservationScreenState extends State<ReservationScreen> {
             ListTile(
               leading: Icon(Icons.access_time, color: Colors.green),
               title: Text(
-                selectedTime == null
-                    ? 'Select Time'
-                    : selectedTime!.format(context),
+                startTime == null
+                    ? 'Select Start Time'
+                    : startTime!.format(context),
                 style: TextStyle(
-                    color: selectedTime == null
-                        ? Colors.black
-                        : Colors.green), // Change text color
+                    color: startTime == null ? Colors.black : Colors.green),
               ),
               trailing: Icon(Icons.arrow_drop_down, color: Colors.green),
-              onTap: () => _selectTime(context),
+              onTap: () => _selectTime(context, isStartTime: true),
+            ),
+            ListTile(
+              leading: Icon(Icons.access_time, color: Colors.green),
+              title: Text(
+                endTime == null ? 'Select End Time' : endTime!.format(context),
+                style: TextStyle(
+                    color: endTime == null ? Colors.black : Colors.green),
+              ),
+              trailing: Icon(Icons.arrow_drop_down, color: Colors.green),
+              onTap: () => _selectTime(context, isStartTime: false),
             ),
             const SizedBox(height: 16),
             const Text('Select Charging Port Type'),
@@ -138,13 +150,15 @@ class _ReservationScreenState extends State<ReservationScreen> {
               child: ElevatedButton(
                 onPressed: () {
                   if (selectedDate != null &&
-                      selectedTime != null &&
+                      startTime != null &&
+                      endTime != null &&
                       selectedPortType != null) {
                     // Create a new booking instance
                     final booking = Booking(
                       stationName: widget.station.name,
                       date: DateFormat.yMMMd().format(selectedDate!),
-                      time: selectedTime!.format(context),
+                      time:
+                          '${startTime!.format(context)} - ${endTime!.format(context)}',
                       portType: selectedPortType!,
                     );
 
@@ -159,7 +173,8 @@ class _ReservationScreenState extends State<ReservationScreen> {
                         builder: (context) => BookingDetailsScreen(
                           stationName: widget.station.name,
                           date: DateFormat.yMMMd().format(selectedDate!),
-                          time: selectedTime!.format(context),
+                          time:
+                              '${startTime!.format(context)} - ${endTime!.format(context)}',
                           portType: selectedPortType!,
                         ),
                       ),

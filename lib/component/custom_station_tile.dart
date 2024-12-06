@@ -1,4 +1,3 @@
-// custom_station_tile.dart
 import 'package:flutter/material.dart';
 
 class CustomStationTile extends StatelessWidget {
@@ -69,13 +68,34 @@ class CustomStationTile extends StatelessWidget {
   Widget _buildStatusIndicator(String status) {
     Color statusColor;
     IconData statusIcon;
+    String statusText;
 
-    if (status.toLowerCase() == 'open') {
-      statusColor = Colors.green;
-      statusIcon = Icons.check_circle;
-    } else {
-      statusColor = Colors.red;
-      statusIcon = Icons.cancel;
+    // Use the status codes from the API response
+    switch (status.toUpperCase()) {
+      case 'OP': // Open
+        statusColor = Colors.green;
+        statusIcon = Icons.check_circle;
+        statusText = 'Open';
+        break;
+      case 'CL': // Closed
+        statusColor = Colors.red;
+        statusIcon = Icons.cancel;
+        statusText = 'Closed';
+        break;
+      case 'BK': // Booked
+        statusColor = Colors.blue;
+        statusIcon = Icons.bookmark;
+        statusText = 'Booked';
+        break;
+      case 'UM': // Under Maintenance
+        statusColor = Colors.orange;
+        statusIcon = Icons.build;
+        statusText = 'Under Maintenance';
+        break;
+      default:
+        statusColor = Colors.grey;
+        statusIcon = Icons.help_outline;
+        statusText = 'Unknown';
     }
 
     return Column(
@@ -88,7 +108,7 @@ class CustomStationTile extends StatelessWidget {
         ),
         const SizedBox(height: 4.0),
         Text(
-          status,
+          statusText,
           style: TextStyle(
             fontSize: 12.0,
             color: statusColor,

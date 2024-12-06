@@ -29,6 +29,7 @@ class _StationsScreenState extends State<StationsScreen> {
 
       if (response.statusCode == 200) {
         final List<dynamic> stationList = json.decode(response.body);
+
         setState(() {
           stations = stationList.map((data) => Station.fromJson(data)).toList();
           isLoading = false;
@@ -77,7 +78,6 @@ class _StationsScreenState extends State<StationsScreen> {
     );
   }
 
-  // Function to show the bottom sliding sheet
   void _showStationDetails(BuildContext context, Station station) {
     showModalBottomSheet(
       context: context,

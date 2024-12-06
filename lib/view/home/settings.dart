@@ -38,8 +38,7 @@ class SettingsScreen extends StatelessWidget {
           ),
           Divider(),
           ListTile(
-            leading:
-                Icon(Icons.directions_car_filled_rounded, color: Colors.green),
+            leading: Icon(Icons.directions_car_rounded, color: Colors.green),
             title: Text('My Vehicles'),
             trailing: Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {

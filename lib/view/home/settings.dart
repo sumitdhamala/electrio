@@ -1,6 +1,7 @@
 import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/view/home/reservation/booking_details.dart';
 import 'package:electrio/view/settings/change_password.dart';
+import 'package:electrio/view/settings/feedback.dart';
 import 'package:electrio/view/settings/mybooking.dart';
 import 'package:electrio/view/settings/myvehicles.dart';
 import 'package:electrio/view/settings/profile_sscreen.dart';
@@ -68,6 +69,15 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
           Divider(),
+          ListTile(
+            leading: Icon(Icons.info, color: Colors.green),
+            title: Text('My Feedback'),
+            trailing: Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              _navigateToFeedback(context);
+            },
+          ),
+          Divider(),
 
           // Logout Option
           ListTile(
@@ -91,6 +101,11 @@ class SettingsScreen extends StatelessWidget {
   void _navigateToChangePassword(BuildContext context) {
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => ChangePasswordScreen()));
+  }
+
+  void _navigateToFeedback(BuildContext context) {
+    // Navigator.push(
+    //     context, MaterialPageRoute(builder: (context) => FeedbackScreen()));
   }
 
   void _navigateToMyVehicles(BuildContext context) {

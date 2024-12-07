@@ -41,7 +41,14 @@ class _HomeViewState extends State<HomeView> {
       if (response.statusCode == 200) {
         setState(() {
           _chargingStations =
-              List<Map<String, dynamic>>.from(json.decode(response.body));
+              List<Map<String, dynamic>>.from(json.decode(response.body))
+                  .map((station) {
+            // Parse charger types independently
+            station['charger_types'] = (station['charger_types'] as List)
+                .map((type) => type['name'].toString()) // Extract type names
+                .toList();
+            return station;
+          }).toList();
         });
       } else {
         throw Exception('Failed to fetch charging stations');
@@ -118,46 +125,42 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _buildPopupContent(Map<String, dynamic> station) {
+    final chargerTypes = station['charger_types'] != null
+        ? (station['charger_types'] as List<dynamic>)
+            .map((type) => type.toString())
+            .join(", ")
+        : "N/A";
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Station Name
         Text(
           station['station_name'],
           style: TextStyle(
               fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
         ),
         SizedBox(height: 8),
-
-        // Location
         Text(
           'Location: ${station['station_location']}',
           style: TextStyle(color: Colors.grey),
         ),
         SizedBox(height: 8),
-
-        // Charger Types and Slots
         Row(
           children: [
-            // Total Slots
             Chip(
               label: Text('Slots: ${station['total_slots']}'),
               backgroundColor: Colors.green.shade100,
               avatar: Icon(Icons.battery_charging_full, size: 16),
             ),
             SizedBox(width: 8),
-            // Charger Types
             Chip(
-              label:
-                  Text('Charger Types: ${station['charger_types'].join(", ")}'),
+              label: Text('Charger Types: $chargerTypes'),
               backgroundColor: Colors.green.shade100,
               avatar: Icon(Icons.power, size: 16),
             ),
           ],
         ),
         SizedBox(height: 8),
-
-        // Amenities with Icons
         Wrap(
           spacing: 8.0,
           children: [
@@ -188,8 +191,6 @@ class _HomeViewState extends State<HomeView> {
           ],
         ),
         SizedBox(height: 8),
-
-        // Get Directions Button
         ElevatedButton.icon(
           onPressed: () {
             final destination = LatLng(
@@ -198,7 +199,6 @@ class _HomeViewState extends State<HomeView> {
             );
             _getRouteToStation(destination);
 
-            // Close the popup by setting _selectedStationLocation to null
             setState(() {
               _selectedStationLocation = null;
             });
@@ -214,8 +214,6 @@ class _HomeViewState extends State<HomeView> {
                 style: TextStyle(color: Colors.grey)),
           ),
         SizedBox(height: 8),
-
-        // Cancel Button
         TextButton(
           onPressed: () {
             setState(() {
@@ -250,7 +248,6 @@ class _HomeViewState extends State<HomeView> {
               ),
               MarkerLayer(
                 markers: [
-                  // User Location Marker
                   Marker(
                     width: 40,
                     height: 40,
@@ -261,7 +258,6 @@ class _HomeViewState extends State<HomeView> {
                       size: 40,
                     ),
                   ),
-                  // Charging Station Markers
                   ..._chargingStations.map((station) {
                     final stationLocation = LatLng(
                       double.parse(station['station_latitude']),
@@ -300,7 +296,7 @@ class _HomeViewState extends State<HomeView> {
                 color: Colors.grey.shade100,
                 child: Container(
                   width: double.infinity,
-                  constraints: BoxConstraints(maxHeight: 350), // Smaller popup
+                  constraints: BoxConstraints(maxHeight: 350),
                   padding: EdgeInsets.all(16.0),
                   child: _buildPopupContent(
                       _chargingStations.firstWhere((station) =>

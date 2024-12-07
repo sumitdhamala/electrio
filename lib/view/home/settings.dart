@@ -1,5 +1,5 @@
 import 'package:electrio/component/customclip_bar.dart';
-import 'package:electrio/view/booking_details.dart';
+import 'package:electrio/view/home/reservation/booking_details.dart';
 import 'package:electrio/view/settings/change_password.dart';
 import 'package:electrio/view/settings/mybooking.dart';
 import 'package:electrio/view/settings/myvehicles.dart';

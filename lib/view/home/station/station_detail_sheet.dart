@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:electrio/component/constants/constants.dart';
-import 'package:electrio/view/reservation_screen.dart';
+import 'package:electrio/view/home/reservation/reservation_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:electrio/model/station_model.dart';
 import 'package:http/http.dart' as http;

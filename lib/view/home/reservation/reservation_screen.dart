@@ -1,7 +1,7 @@
 import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/model/booking_model.dart';
 import 'package:electrio/model/station_model.dart';
-import 'package:electrio/view/booking_details.dart';
+import 'package:electrio/view/home/reservation/booking_details.dart';
 import 'package:electrio/provider/booking_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -192,7 +192,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
                       const EdgeInsets.symmetric(horizontal: 36, vertical: 12),
                 ),
                 child: const Text(
-                  'Confirm Reservation',
+                  ' Next',
                   style: TextStyle(color: Colors.white),
                 ),
               ),

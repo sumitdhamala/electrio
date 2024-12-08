@@ -1,7 +1,10 @@
 import 'package:electrio/component/constants/constants.dart';
+import 'package:electrio/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:provider/provider.dart';
 
 class FeedbackScreen extends StatefulWidget {
   final int stationId; // Pass the station ID as a parameter
@@ -14,10 +17,10 @@ class FeedbackScreen extends StatefulWidget {
 
 class _FeedbackScreenState extends State<FeedbackScreen> {
   final TextEditingController _feedbackController = TextEditingController();
-  int _selectedRating = 0;
+  int? _selectedRating; // Use `int?` to allow `null` for unselected ratings
 
   Future<void> _submitFeedback() async {
-    if (_selectedRating == 0) {
+    if (_selectedRating == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Please select a rating before submitting.'),
         backgroundColor: Colors.red,
@@ -34,22 +37,39 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       return;
     }
 
+    // Get the token from UserProvider
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final token = userProvider.token;
+
+    if (token == null || token.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Authentication required. Please log in again.'),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+
     // Prepare data to send
     final payload = {
-      "station_id": widget.stationId,
+      "station": widget.stationId.toString(),
       "feedback": feedback,
-      "rating": _selectedRating,
+      "rating": _selectedRating.toString(), // Safely convert rating to string
     };
+
+    print("Payload: $payload"); // Log payload for debugging
 
     try {
       final response = await http.post(
-        Uri.parse(
-            '$url/feedbacks/feedbacks/'), // Replace with your endpoint
+        Uri.parse('$url/feedbacks/feedbacks/'),
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Token $token', // Include the auth token
         },
         body: jsonEncode(payload),
       );
+
+      print("Response Status: ${response.statusCode}");
+      print("Response Body: ${response.body}");
 
       if (response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -59,7 +79,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
         // Clear the inputs after submission
         setState(() {
-          _selectedRating = 0;
+          _selectedRating = null; // Reset rating to null
           _feedbackController.clear();
         });
       } else {
@@ -75,6 +95,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         content: Text('An error occurred: $e'),
         backgroundColor: Colors.red,
       ));
+      print("Error: $e");
     }
   }
 
@@ -86,7 +107,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         return IconButton(
           icon: Icon(
             Icons.star,
-            color: starIndex <= _selectedRating ? Colors.green : Colors.grey,
+            color: starIndex <= (_selectedRating ?? 0)
+                ? Colors.green
+                : Colors.grey,
           ),
           onPressed: () {
             setState(() {

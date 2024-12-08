@@ -1,5 +1,6 @@
 import 'package:electrio/provider/auth_provider.dart';
 import 'package:electrio/provider/booking_provider.dart';
+import 'package:electrio/provider/reservationprovider.dart';
 import 'package:electrio/provider/user_provider.dart';
 import 'package:electrio/provider/vehicle_provider.dart';
 import 'package:electrio/view/settings/profile_sscreen.dart';
@@ -34,6 +35,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => BookingProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => Reservationprovider(),
         ),
         ChangeNotifierProvider(
           create: (_) => VehicleProvider(),

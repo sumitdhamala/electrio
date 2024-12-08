@@ -11,13 +11,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
+  int _currentIndex = 1;
 
   // List of screens to display
   final List<Widget> _children = [
-    HomeView(),
     StationsScreen(),
-    HistoryScreen(),
+    HomeView(),
     SettingsScreen(),
   ];
 
@@ -27,9 +26,9 @@ class _HomeScreenState extends State<HomeScreen> {
       body: _children[_currentIndex],
       bottomNavigationBar: CurvedNavigationBar(
         items: <Widget>[
-          _navItem(Icons.home, 'Home', 0),
-          _navItem(Icons.charging_station_outlined, 'Charging', 1),
-          _navItem(Icons.history_edu_outlined, 'History', 2),
+          _navItem(Icons.charging_station_outlined, 'Charging', 0),
+          _navItem(Icons.home, 'Home', 1),
+          // _navItem(Icons.history_edu_outlined, 'History', 2),
           _navItem(Icons.settings, 'Settings', 3),
         ],
         color: Colors.white, // Set background color to white

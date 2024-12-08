@@ -1,8 +1,8 @@
 import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/model/booking_model.dart';
 import 'package:electrio/model/station_model.dart';
+import 'package:electrio/provider/reservationprovider.dart';
 import 'package:electrio/view/home/reservation/booking_details.dart';
-import 'package:electrio/provider/booking_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +22,13 @@ class _ReservationScreenState extends State<ReservationScreen> {
   TimeOfDay? endTime;
   String? selectedPortType;
   final List<String> portTypes = ['CCS1', 'CCS2', 'GB/T'];
+
+  String convertTo24Hour(TimeOfDay time) {
+    final now = DateTime.now();
+    final dateTime =
+        DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    return DateFormat('HH:mm').format(dateTime); // Converts to "HH:mm" format
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -147,56 +154,58 @@ class _ReservationScreenState extends State<ReservationScreen> {
             ),
             const SizedBox(height: 24),
             Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  if (selectedDate != null &&
-                      startTime != null &&
-                      endTime != null &&
-                      selectedPortType != null) {
-                    // Create a new booking instance
-                    final booking = Booking(
-                      stationName: widget.station.name,
-                      date: DateFormat.yMMMd().format(selectedDate!),
-                      time:
-                          '${startTime!.format(context)} - ${endTime!.format(context)}',
-                      portType: selectedPortType!,
-                    );
+                child: ElevatedButton(
+              onPressed: () {
+                if (selectedDate != null &&
+                    startTime != null &&
+                    endTime != null &&
+                    selectedPortType != null) {
+                  // Format the times into 24-hour format before sending them
+                  final formattedStartTime = convertTo24Hour(startTime!);
+                  final formattedEndTime = convertTo24Hour(endTime!);
 
-                    // Add booking to provider
-                    Provider.of<BookingProvider>(context, listen: false)
-                        .addBooking(booking);
+                  // Create a new booking instance
+                  final booking = Booking(
+                    stationName: widget.station.name,
+                    date: DateFormat.yMMMd().format(selectedDate!),
+                    time: '$formattedStartTime - $formattedEndTime',
+                    portType: selectedPortType!,
+                  );
 
-                    // Navigate to the BookingDetailsScreen with the reservation details
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BookingDetailsScreen(
-                          stationName: widget.station.name,
-                          date: DateFormat.yMMMd().format(selectedDate!),
-                          time:
-                              '${startTime!.format(context)} - ${endTime!.format(context)}',
-                          portType: selectedPortType!,
-                        ),
+                  // Add booking to provider
+                  Provider.of<Reservationprovider>(context, listen: false)
+                      .addBooking(booking);
+
+                  // Navigate to the BookingDetailsScreen with the reservation details
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BookingDetailsScreen(
+                        stationName: widget.station.name,
+                        date: DateFormat.yMMMd().format(selectedDate!),
+                        time:
+                            '$formattedStartTime - $formattedEndTime', // Send formatted time
+                        portType: selectedPortType!,
                       ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Please fill in all details.')),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 36, vertical: 12),
-                ),
-                child: const Text(
-                  ' Next',
-                  style: TextStyle(color: Colors.white),
-                ),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Please fill in all details.')),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 36, vertical: 12),
               ),
-            ),
+              child: const Text(
+                ' Next',
+                style: TextStyle(color: Colors.white),
+              ),
+            )),
           ],
         ),
       ),

@@ -33,46 +33,25 @@ class BookingDetailsScreen extends StatelessWidget {
       }
 
       // Parse the date string into a proper DateTime format
-      final parsedDate = DateFormat.yMMMd().parse(date); // From "Dec 10, 2024"
+      final parsedDate = DateFormat.yMMMd().parse(date); // e.g., "Dec 10, 2024"
 
-      // Convert TimeOfDay to 24-hour time format
-      String formatTime(TimeOfDay time) {
-        final now = DateTime.now();
-        final dateTime =
-            DateTime(now.year, now.month, now.day, time.hour, time.minute);
-        return DateFormat.Hm().format(dateTime); // Produces 'HH:mm'
-      }
+      // Debug: Print parsed date
+      print('Parsed Date: ${DateFormat('yyyy-MM-dd').format(parsedDate)}');
 
-      final startTimeParts = time.split(' - ')[0];
-      final endTimeParts = time.split(' - ')[1];
-
-      final startTime = TimeOfDay(
-        hour: int.parse(startTimeParts.split(':')[0]),
-        minute: int.parse(
-            startTimeParts.split(':')[1].replaceAll(RegExp('[^0-9]'), '')),
-      );
-      final endTime = TimeOfDay(
-        hour: int.parse(endTimeParts.split(':')[0]),
-        minute: int.parse(
-            endTimeParts.split(':')[1].replaceAll(RegExp('[^0-9]'), '')),
-      );
-
-      final startTimeFormatted = formatTime(startTime);
-      final endTimeFormatted = formatTime(endTime);
-
-      // Combine parsedDate with times to ensure proper ISO 8601 format
-      final startDateTime =
-          '${DateFormat('yyyy-MM-dd').format(parsedDate)}T$startTimeFormatted:00';
-      final endDateTime =
-          '${DateFormat('yyyy-MM-dd').format(parsedDate)}T$endTimeFormatted:00';
-
+      // Prepare payload
       final payload = {
-        "station": stationId,
-        "start_time": startDateTime,
-        "end_time": endDateTime,
+        "station": stationId.toString(),
         "booked_date": DateFormat('yyyy-MM-dd').format(parsedDate),
+        "start_time": time.split(
+            ' - ')[0], // Just use the formatted time from ReservationScreen
+        "end_time": time.split(
+            ' - ')[1], // Just use the formatted time from ReservationScreen
       };
 
+      // Debug: Print payload
+      print('Payload: $payload');
+
+      // Make POST request
       final response = await http.post(
         Uri.parse('$url/reserve/reserve/'),
         headers: {
@@ -87,13 +66,17 @@ class BookingDetailsScreen extends StatelessWidget {
           const SnackBar(content: Text('Booking successfully completed!')),
         );
       } else {
-        print('Failed to complete booking: ${response.body}');
+        // Debug: Print failure response
+        print(
+            'Failed Response: ${response.statusCode}, Body: ${response.body}');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text('Failed to complete booking: ${response.body}')),
+            content: Text('Failed to complete booking: ${response.body}'),
+          ),
         );
       }
     } catch (e) {
+      // Debug: Print exception
       print('An error occurred: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('An error occurred: $e')),
@@ -101,13 +84,7 @@ class BookingDetailsScreen extends StatelessWidget {
     }
   }
 
-// Helper method to convert time to 24-hour format (hh:mm:ss)
-  String _convertTo24Hour(String time) {
-    final parsedTime = DateFormat.jm().parse(time);
-    return DateFormat('HH:mm').format(parsedTime);
-  }
-
-// Example function to retrieve station ID
+  // Example function to retrieve station ID
   Future<int?> getStationIdByName(String stationName) async {
     try {
       final response = await http.get(Uri.parse('$url/reserve/stations/'));

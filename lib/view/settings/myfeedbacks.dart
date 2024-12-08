@@ -64,29 +64,42 @@ class _UserFeedbacksScreenState extends State<UserFeedbacksScreen> {
   }
 
   Future<void> _fetchStationName(int stationId, String token) async {
-    // Check if the station name is already cached
     if (_stationNames.containsKey(stationId)) return;
 
     try {
       final response = await http.get(
-        Uri.parse(
-            '$url/stations/$stationId/'), // Replace with your station endpoint
+        Uri.parse('$url/stations/$stationId/'), // Make sure this URL is correct
         headers: {
           'Authorization': 'Token $token',
         },
       );
 
+      print("Response Status: ${response.statusCode}");
+      print(
+          "Response Body: ${response.body}"); // Log the full response for inspection
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        setState(() {
-          _stationNames[stationId] = data['name'] ?? "Unknown Station";
-        });
+        print('Station data: $data'); // Log the response data for inspection
+
+        if (data.containsKey('name')) {
+          setState(() {
+            _stationNames[stationId] = data['name'] ?? "Unknown Station";
+          });
+        } else {
+          setState(() {
+            _stationNames[stationId] = "Name Not Available";
+          });
+        }
       } else {
+        print(
+            'Failed to fetch station name. Status Code: ${response.statusCode}');
         setState(() {
-          _stationNames[stationId] = "Unknown Station";
+          _stationNames[stationId] = "Error Fetching Name";
         });
       }
     } catch (e) {
+      print("Error fetching station name: $e");
       setState(() {
         _stationNames[stationId] = "Error Fetching Name";
       });

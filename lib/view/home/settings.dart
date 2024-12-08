@@ -3,6 +3,7 @@ import 'package:electrio/view/home/reservation/booking_details.dart';
 import 'package:electrio/view/settings/change_password.dart';
 import 'package:electrio/view/settings/feedback.dart';
 import 'package:electrio/view/settings/mybooking.dart';
+import 'package:electrio/view/settings/myfeedbacks.dart';
 import 'package:electrio/view/settings/myvehicles.dart';
 import 'package:electrio/view/settings/profile_sscreen.dart';
 import 'package:electrio/view/signup/forget_password.dart';
@@ -104,8 +105,8 @@ class SettingsScreen extends StatelessWidget {
   }
 
   void _navigateToFeedback(BuildContext context) {
-    // Navigator.push(
-    //     context, MaterialPageRoute(builder: (context) => FeedbackScreen()));
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => UserFeedbacksScreen()));
   }
 
   void _navigateToMyVehicles(BuildContext context) {

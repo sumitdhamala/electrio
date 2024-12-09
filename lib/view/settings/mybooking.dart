@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:electrio/component/constants/constants.dart';
+import 'package:electrio/view/payment/payment.dart';
 import 'package:electrio/view/settings/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -67,6 +68,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                     'time': "${booking['start_time']} - ${booking['end_time']}",
                     'price': double.tryParse(booking['total_cost']) ?? 0.0,
                     'stationid': booking['station'],
+                    'user': booking['user']
                   })
               .toList();
           isLoading = false;
@@ -216,7 +218,10 @@ class HistoryTile extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Navigate to payment page
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => KhaltiPaymentScreen()));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,

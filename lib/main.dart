@@ -10,11 +10,13 @@ import 'package:electrio/view/signup/loginpage.dart';
 import 'package:electrio/view/signup/signup.dart';
 import 'package:electrio/view/signup/vehicle_registration.dart';
 import 'package:electrio/view/splash_screen.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   final authProvider = AuthProvider();
   await authProvider.loadToken();
   runApp(const MyApp());

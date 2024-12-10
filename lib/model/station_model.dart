@@ -12,6 +12,7 @@ class Station {
   final bool hasRestrooms;
   final double? latitude; // Added latitude
   final double? longitude; // Added longitude
+  double? distance;
 
   Station({
     required this.id,
@@ -26,7 +27,8 @@ class Station {
     required this.hasParking,
     required this.hasRestrooms,
     this.latitude, // Required latitude
-    this.longitude, // Required longitude
+    this.longitude,
+    this.distance, // Required longitude
   });
 
   // Updated fromJson method to include latitude and longitude

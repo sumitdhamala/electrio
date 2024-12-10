@@ -5,6 +5,7 @@ class CustomStationTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final String status;
+  final double? distance;
 
   const CustomStationTile({
     Key? key,
@@ -12,6 +13,7 @@ class CustomStationTile extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.status,
+    this.distance,
   }) : super(key: key);
 
   @override
@@ -52,7 +54,7 @@ class CustomStationTile extends StatelessWidget {
               SizedBox(width: 4.0),
               Expanded(
                 child: Text(
-                  subtitle,
+                  "$subtitle (${distance != null && distance! < double.infinity ? '${distance!.toStringAsFixed(1)} km' : 'N/A'})",
                   style: TextStyle(color: Colors.grey[600], fontSize: 12),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -70,24 +72,23 @@ class CustomStationTile extends StatelessWidget {
     IconData statusIcon;
     String statusText;
 
-    // Use the status codes from the API response
     switch (status.toUpperCase()) {
-      case 'OP': // Open
+      case 'OP':
         statusColor = Colors.green;
         statusIcon = Icons.check_circle;
         statusText = 'Open';
         break;
-      case 'CL': // Closed
+      case 'CL':
         statusColor = Colors.red;
         statusIcon = Icons.cancel;
         statusText = 'Closed';
         break;
-      case 'BK': // Booked
+      case 'BK':
         statusColor = Colors.blue;
         statusIcon = Icons.bookmark;
         statusText = 'Booked';
         break;
-      case 'UM': // Under Maintenance
+      case 'UM':
         statusColor = Colors.orange;
         statusIcon = Icons.build;
         statusText = 'Under Maintenance';
@@ -109,11 +110,7 @@ class CustomStationTile extends StatelessWidget {
         const SizedBox(height: 4.0),
         Text(
           statusText,
-          style: TextStyle(
-            fontSize: 12.0,
-            color: statusColor,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 10, color: Colors.black),
         ),
       ],
     );

@@ -4,7 +4,10 @@ import 'package:electrio/component/constants/constants.dart';
 import 'package:electrio/view/home/reservation/reservation_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:electrio/model/station_model.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class StationDetailSheet extends StatelessWidget {
   final Station station;
@@ -189,8 +192,29 @@ class StationDetailSheet extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           ElevatedButton(
-            onPressed: () {
-              print('Get Directions');
+            onPressed: () async {
+              try {
+                Position position = await Geolocator.getCurrentPosition(
+                    locationSettings:
+                        LocationSettings(accuracy: LocationAccuracy.high));
+
+                final userLatitude = position.latitude;
+                final userLongitude = position.longitude;
+                final destinationLatitude = double.parse("${station.latitude}");
+                final destinationLongitude =
+                    double.parse("${station.longitude}");
+
+                final googleMapsUrl =
+                    "https://www.google.com/maps/dir/?api=1&origin=$userLatitude,$userLongitude&destination=$destinationLatitude,$destinationLongitude&travelmode=driving";
+
+                if (await canLaunchUrlString(googleMapsUrl)) {
+                  await launchUrlString(googleMapsUrl);
+                } else {
+                  throw "Could not launch Google Maps.";
+                }
+              } catch (e) {
+                print('Error launching Google Maps: $e');
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
@@ -203,8 +227,11 @@ class StationDetailSheet extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ReservationScreen(station: station)));
-              print('Book Now');
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ReservationScreen(station: station)));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,

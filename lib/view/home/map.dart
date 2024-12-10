@@ -90,12 +90,19 @@ class _HomeViewState extends State<HomeView> {
       return;
     }
 
+    // Updated: Use LocationSettings instead of deprecated desiredAccuracy
+    LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high, // High accuracy location
+      distanceFilter: 10, // Minimum distance in meters to notify
+    );
+
     // Get the current position of the user
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+    Position position =
+        await Geolocator.getCurrentPosition(locationSettings: locationSettings);
     setState(() {
       _currentLocation = LatLng(position.latitude, position.longitude);
     });
+    print("Current Location: $_currentLocation");
   }
 
   Future<void> _getRouteToStation(LatLng destination) async {
@@ -125,6 +132,8 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _buildPopupContent(Map<String, dynamic> station) {
+    print("Current Location: $_currentLocation");
+
     final chargerTypes = station['charger_types'] != null
         ? (station['charger_types'] as List<dynamic>)
             .map((type) => type.toString())
@@ -154,7 +163,7 @@ class _HomeViewState extends State<HomeView> {
             ),
             SizedBox(width: 8),
             Chip(
-              label: Text('Charger Types: $chargerTypes'),
+              label: Text('Types: $chargerTypes'),
               backgroundColor: Colors.green.shade100,
               avatar: Icon(Icons.power, size: 16),
             ),

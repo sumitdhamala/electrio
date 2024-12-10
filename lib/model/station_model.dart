@@ -10,8 +10,8 @@ class Station {
   final bool hasWifi;
   final bool hasParking;
   final bool hasRestrooms;
-  // final double latitude; // Added latitude
-  // final double longitude; // Added longitude
+  final double? latitude; // Added latitude
+  final double? longitude; // Added longitude
 
   Station({
     required this.id,
@@ -25,8 +25,8 @@ class Station {
     required this.hasWifi,
     required this.hasParking,
     required this.hasRestrooms,
-    // required this.latitude, // Required latitude
-    // required this.longitude, // Required longitude
+    this.latitude, // Required latitude
+    this.longitude, // Required longitude
   });
 
   // Updated fromJson method to include latitude and longitude
@@ -45,8 +45,12 @@ class Station {
       hasWifi: json['has_wifi'],
       hasParking: json['has_parking'],
       hasRestrooms: json['has_restrooms'],
-      // latitude: json['station_latitude'], // Directly assign as double
-      // longitude: json['station_longitude'], // Directly assign as double
+      latitude: json['station_latitude'] != null
+          ? double.tryParse(json['station_latitude'].toString())
+          : null,
+      longitude: json['station_longitude'] != null
+          ? double.tryParse(json['station_longitude'].toString())
+          : null,
     );
   }
 }

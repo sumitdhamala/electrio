@@ -8,6 +8,9 @@ import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 
 class HomeView extends StatefulWidget {
+   final LatLng? fallbackRouteDestination; // Add fallback route parameter
+
+  const HomeView({super.key, this.fallbackRouteDestination});
   @override
   _HomeViewState createState() => _HomeViewState();
 }
@@ -27,6 +30,13 @@ class _HomeViewState extends State<HomeView> {
     _fetchChargingStations();
     _startStatusRefreshTimer();
     _getUserLocation();
+
+    // Trigger route calculation if fallback destination is provided
+    if (widget.fallbackRouteDestination != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _getRouteToStation(widget.fallbackRouteDestination!);
+      });
+    }
   }
 
   @override

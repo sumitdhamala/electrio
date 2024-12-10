@@ -27,17 +27,7 @@ class SettingsScreen extends StatelessWidget {
               _navigateToProfile(context);
             },
           ),
-          Divider(),
 
-          // Change Password Option
-          ListTile(
-            leading: Icon(Icons.lock, color: Colors.green),
-            title: Text('Change Password'),
-            trailing: Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {
-              _navigateToChangePassword(context);
-            },
-          ),
           Divider(),
           ListTile(
             leading: Icon(Icons.directions_car_rounded, color: Colors.green),
@@ -60,6 +50,27 @@ class SettingsScreen extends StatelessWidget {
           ),
           Divider(),
 
+          ListTile(
+            leading: Icon(Icons.feedback_rounded, color: Colors.green),
+            title: Text('My Feedback'),
+            trailing: Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              _navigateToFeedback(context);
+            },
+          ),
+          Divider(),
+
+          // Change Password Option
+          ListTile(
+            leading: Icon(Icons.lock, color: Colors.green),
+            title: Text('Change Password'),
+            trailing: Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              _navigateToChangePassword(context);
+            },
+          ),
+          Divider(),
+
           // About Option
           ListTile(
             leading: Icon(Icons.info, color: Colors.green),
@@ -71,23 +82,14 @@ class SettingsScreen extends StatelessWidget {
           ),
           Divider(),
           ListTile(
-            leading: Icon(Icons.info, color: Colors.green),
-            title: Text('My Feedback'),
-            trailing: Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {
-              _navigateToFeedback(context);
-            },
-          ),
-          Divider(),
-
-          // Logout Option
-          ListTile(
             leading: Icon(Icons.logout, color: Colors.red),
             title: Text('Logout'),
             onTap: () {
               _showLogoutDialog(context);
             },
           ),
+
+          // Logout Option
         ],
       ),
     );

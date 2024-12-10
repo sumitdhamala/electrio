@@ -100,7 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ? FileImage(
                                               userProvider.profileImage!)
                                           : const NetworkImage(
-                                              "https://scontent.fpkr2-1.fna.fbcdn.net/v/t39.30808-6/467311013_2890105254492263_146244950505858188_n.jpg?stp=dst-jpg_p526x296&_nc_cat=110&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeExECEUBaUDEqiv6TLY2_1TLPKFmXboweEs8oWZdujB4R1vPySO5wWdYwn03AascpAUr8mtlgwfKvqY8FjWSfdT&_nc_ohc=txqLmBcQZgwQ7kNvgE7VW0G&_nc_zt=23&_nc_ht=scontent.fpkr2-1.fna&_nc_gid=AYkC9mGJgMkHFy2MXoGK3Zl&oh=00_AYB2cRMQwZiL0K1MzXmPTf2wG7p6uFmo-BmYJ7Na4BtUOQ&oe=67549ED7"),
+                                              "https://picsum.photos/200/300"),
                                     ),
                                     SizedBox(width: 15),
                                     Text(

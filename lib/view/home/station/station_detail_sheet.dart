@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:electrio/component/constants/constants.dart';
+import 'package:electrio/view/home/map.dart';
 import 'package:electrio/view/home/reservation/reservation_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:electrio/model/station_model.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -170,6 +172,22 @@ class StationDetailSheet extends StatelessWidget {
     );
   }
 
+  void _redirectToAppMapPage(BuildContext context, Station station) {
+    final destination = LatLng(
+      double.parse("${station.latitude}"),
+      double.parse("${station.longitude}"),
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HomeView(
+          fallbackRouteDestination: destination, // Pass the destination
+        ),
+      ),
+    );
+  }
+
   Widget _buildFacilityChip(String label, IconData icon, Color color) {
     return Chip(
       label: Row(
@@ -214,6 +232,7 @@ class StationDetailSheet extends StatelessWidget {
                 }
               } catch (e) {
                 print('Error launching Google Maps: $e');
+                _redirectToAppMapPage(context, station);
               }
             },
             style: ElevatedButton.styleFrom(

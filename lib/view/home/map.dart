@@ -8,7 +8,7 @@ import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 
 class HomeView extends StatefulWidget {
-   final LatLng? fallbackRouteDestination; // Add fallback route parameter
+  final LatLng? fallbackRouteDestination; // Add fallback route parameter
 
   const HomeView({super.key, this.fallbackRouteDestination});
   @override
@@ -249,7 +249,12 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text('Charging Stations'), backgroundColor: Colors.green),
+          centerTitle: true,
+          title: Text(
+            'Map',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.green),
       body: Stack(
         children: [
           FlutterMap(

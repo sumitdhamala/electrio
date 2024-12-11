@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
@@ -175,7 +177,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           );
                         },
                         child: const Text("  Edit Profile  ",
-                            style: TextStyle(fontSize: 18)),
+                            style:
+                                TextStyle(fontSize: 18, color: Colors.white)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           padding: EdgeInsets.symmetric(vertical: 18),

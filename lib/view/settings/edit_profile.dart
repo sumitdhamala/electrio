@@ -1,3 +1,4 @@
+import 'package:electrio/component/customclip_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:electrio/provider/user_provider.dart';
@@ -52,11 +53,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: const Text("Edit Profile"),
-        backgroundColor: Colors.green,
-        elevation: 0,
-      ),
+      appBar: CustomCurvedAppBar(title: "Edit Profile"),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -64,7 +61,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 40),
+              const SizedBox(height: 80),
               // First Name Field
               _buildTextField(
                 "First Name",
@@ -82,7 +79,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 "Email",
                 email,
                 (value) => email = value,
-                readOnly: true, // Optional: Make email non-editable
+                readOnly: true, 
               ),
               // Contact Field
               _buildTextField(
@@ -97,17 +94,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 (value) => address = value,
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _updateProfile,
-                child: const Text(
-                  "Save Changes",
-                  style: TextStyle(fontSize: 18),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _updateProfile,
+                  child: const Text(
+                    "  Save Changes   ",
+                    style: TextStyle(fontSize: 18, color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
                 ),
               ),

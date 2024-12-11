@@ -1,3 +1,4 @@
+import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/view/signup/vehicle_registration.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -43,7 +44,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Email verified successfully!')),
         );
-        Navigator.push(context,
+        Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => VehicleRegistrationPage()));
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -58,10 +59,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: const Color(0xffF0F4F8), // Grey background
-        appBar: AppBar(
-          title: const Text('OTP Verification'),
-          backgroundColor: const Color(0xff4CAF50), // Green theme
-        ),
+        appBar: CustomCurvedAppBar(title: "Verify OTP"),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -108,7 +106,10 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                       textStyle: const TextStyle(fontSize: 16),
                     ),
                     onPressed: _verifyOTP,
-                    child: const Text('Verify OTP'),
+                    child: const Text(
+                      ' Verify OTP ',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),

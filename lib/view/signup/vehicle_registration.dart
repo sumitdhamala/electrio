@@ -1,5 +1,6 @@
 import 'package:electrio/component/custom_form_button.dart';
 import 'package:electrio/component/custom_textfield.dart';
+import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -36,19 +37,12 @@ class _VehicleRegistrationPageState extends State<VehicleRegistrationPage> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: const Color(0xffEEF1F3),
+        appBar: CustomCurvedAppBar(title: "Vehicle Registration"),
         body: SingleChildScrollView(
           child: Form(
             key: _vehicleFormKey,
             child: Column(
               children: [
-                const SizedBox(height: 40),
-                const Text(
-                  "Vehicle Registration",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
                 const SizedBox(height: 20),
                 CustomInputField(
                   labelText: 'Vehicle Company',
@@ -135,7 +129,7 @@ class _VehicleRegistrationPageState extends State<VehicleRegistrationPage> {
                 ),
                 const SizedBox(height: 20),
                 CustomFormButton(
-                  innerText: 'Register Vehicle',
+                  innerText: ' Register Vehicle',
                   onPressed: _registerVehicle,
                 ),
               ],

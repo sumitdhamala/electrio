@@ -11,7 +11,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 1;
+  int _currentIndex = 1; // Default to Home
 
   // List of screens to display
   final List<Widget> _children = [
@@ -25,11 +25,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: _children[_currentIndex],
       bottomNavigationBar: CurvedNavigationBar(
+        index:
+            _currentIndex, // Ensure the nav bar index matches the initial screen
         items: <Widget>[
-          _navItem(Icons.charging_station_outlined, 'Charging', 0),
+          _navItem(Icons.charging_station_outlined, 'Stations', 0),
           _navItem(Icons.home, 'Home', 1),
-          // _navItem(Icons.history_edu_outlined, 'History', 2),
-          _navItem(Icons.settings, 'Settings', 3),
+          _navItem(Icons.settings, 'Settings', 2),
         ],
         color: Colors.white, // Set background color to white
         buttonBackgroundColor: Colors.white, // Button background color

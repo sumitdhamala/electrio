@@ -1,3 +1,4 @@
+import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/view/signup/check_otp.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -56,10 +57,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: const Color(0xffF0F4F8), // Grey background
-        appBar: AppBar(
-          title: const Text('Email Verification'),
-          backgroundColor: const Color(0xff4CAF50), // Green theme
-        ),
+        appBar: CustomCurvedAppBar(title: "Email Verification"),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -106,7 +104,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       textStyle: const TextStyle(fontSize: 16),
                     ),
                     onPressed: _sendVerificationEmail,
-                    child: const Text('Send Verification Email'),
+                    child: const Text(
+                      ' Send Verification Email ',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),

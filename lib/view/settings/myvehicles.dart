@@ -1,3 +1,4 @@
+import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/provider/user_provider.dart';
 import 'package:electrio/view/settings/editvehicle.dart';
 import 'package:flutter/material.dart';
@@ -24,11 +25,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     final userProvider = Provider.of<UserProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Your Vehicles'),
-        backgroundColor: Colors.blue,
-        elevation: 0,
-      ),
+      appBar: CustomCurvedAppBar(title: "Your Vehicle"),
       body: FutureBuilder(
         future: _fetchVehiclesFuture,
         builder: (context, snapshot) {
@@ -129,7 +126,10 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                             userProvider.fetchUserVehicles();
                           });
                         },
-                        child: const Text('Edit Vehicle'),
+                        child: const Text(
+                          'Edit Vehicle',
+                          style: TextStyle(color: Colors.white),
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           padding: const EdgeInsets.symmetric(

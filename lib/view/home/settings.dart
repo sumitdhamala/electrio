@@ -136,19 +136,25 @@ class SettingsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Logout'),
+        title: Text(
+          'Log Out',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         content: Text('Are you sure you want to log out?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel'),
+            child: Text('Cancel', style: TextStyle(color: Colors.green)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pushNamed(context, '/login');
               print('Logged out');
             },
-            child: Text('Logout'),
+            child: Text(
+              'Logout',
+              style: TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),

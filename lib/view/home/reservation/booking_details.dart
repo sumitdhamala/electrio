@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:electrio/component/constants/constants.dart';
 import 'package:electrio/component/customclip_bar.dart';
+import 'package:electrio/view/payment/payment.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-class BookingDetailsScreen extends StatelessWidget {
+class BookingDetailsScreen extends StatefulWidget {
   final String stationName;
   final String date;
   final String time;
@@ -20,6 +21,13 @@ class BookingDetailsScreen extends StatelessWidget {
     required this.portType,
   }) : super(key: key);
 
+  @override
+  _BookingDetailsScreenState createState() => _BookingDetailsScreenState();
+}
+
+class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
+  Map<String, dynamic>? bookingDetails; // Holds API response data
+
   Future<void> _confirmBooking(BuildContext context) async {
     try {
       // Retrieve token from SharedPreferences
@@ -27,29 +35,21 @@ class BookingDetailsScreen extends StatelessWidget {
       final token = prefs.getString('token');
 
       // Convert stationName to station ID
-      final stationId = await getStationIdByName(stationName);
+      final stationId = await getStationIdByName(widget.stationName);
       if (stationId == null) {
-        throw Exception("Invalid station: $stationName");
+        throw Exception("Invalid station: ${widget.stationName}");
       }
 
       // Parse the date string into a proper DateTime format
-      final parsedDate = DateFormat.yMMMd().parse(date); // e.g., "Dec 10, 2024"
-
-      // Debug: Print parsed date
-      print('Parsed Date: ${DateFormat('yyyy-MM-dd').format(parsedDate)}');
+      final parsedDate = DateFormat.yMMMd().parse(widget.date);
 
       // Prepare payload
       final payload = {
         "station": stationId.toString(),
         "booked_date": DateFormat('yyyy-MM-dd').format(parsedDate),
-        "start_time": time.split(
-            ' - ')[0], // Just use the formatted time from ReservationScreen
-        "end_time": time.split(
-            ' - ')[1], // Just use the formatted time from ReservationScreen
+        "start_time": widget.time.split(' - ')[0],
+        "end_time": widget.time.split(' - ')[1],
       };
-
-      // Debug: Print payload
-      print('Payload: $payload');
 
       // Make POST request
       final response = await http.post(
@@ -62,13 +62,17 @@ class BookingDetailsScreen extends StatelessWidget {
       );
 
       if (response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+
+        // Update the state with booking details
+        setState(() {
+          bookingDetails = responseData;
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Booking successfully completed!')),
         );
       } else {
-        // Debug: Print failure response
-        print(
-            'Failed Response: ${response.statusCode}, Body: ${response.body}');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to complete booking: ${response.body}'),
@@ -76,15 +80,13 @@ class BookingDetailsScreen extends StatelessWidget {
         );
       }
     } catch (e) {
-      // Debug: Print exception
-      print('An error occurred: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('An error occurred: $e')),
       );
     }
   }
 
-  // Example function to retrieve station ID
+  // Function to fetch station ID by name
   Future<int?> getStationIdByName(String stationName) async {
     try {
       final response = await http.get(Uri.parse('$url/reserve/stations/'));
@@ -99,14 +101,11 @@ class BookingDetailsScreen extends StatelessWidget {
           orElse: () => null,
         );
 
-        // Return the station ID if found
         return station != null ? station['id'] as int : null;
       } else {
-        print('Failed to fetch station list: ${response.body}');
         return null;
       }
     } catch (e) {
-      print('Error while fetching station list: $e');
       return null;
     }
   }
@@ -136,13 +135,22 @@ class BookingDetailsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                _buildDetailRow('Station Name:', stationName),
+                _buildDetailRow('Station Name:', widget.stationName),
                 const SizedBox(height: 12),
-                _buildDetailRow('Date:', date),
+                _buildDetailRow('Date:', widget.date),
                 const SizedBox(height: 12),
-                _buildDetailRow('Time:', time),
+                _buildDetailRow('Time:', widget.time),
                 const SizedBox(height: 12),
-                _buildDetailRow('Charging Port Type:', portType),
+                _buildDetailRow('Charging Port Type:', widget.portType),
+                if (bookingDetails != null) ...[
+                  const SizedBox(height: 12),
+                  _buildDetailRow(
+                      'Total Cost:', '\Rs.${bookingDetails!['total_cost']}'),
+                  const SizedBox(height: 12),
+
+                  _buildDetailRow('Booking ID:', '${bookingDetails!['id']}'),
+                  // _buildDetailRow('Status:', '${bookingDetails!['status']}'),
+                ],
                 const SizedBox(height: 24),
                 Center(
                   child: Column(
@@ -183,7 +191,12 @@ class BookingDetailsScreen extends StatelessWidget {
                       const SizedBox(height: 16),
                       OutlinedButton(
                         onPressed: () {
-                          // Add your payment navigation logic here
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => KhaltiPaymentScreen(
+                                        amount: bookingDetails!['total_cost']
+                                      )));
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                                 content: Text('Navigate to payment screen.')),

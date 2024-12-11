@@ -1,3 +1,4 @@
+import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -49,12 +50,9 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
     final userProvider = Provider.of<UserProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Vehicle'),
-        backgroundColor: Colors.green,
-      ),
+      appBar: CustomCurvedAppBar(title: "Edit Vehicle"),
       body: Container(
-        color: Color(0xFFf1f1f1), // Light grey background
+        // color: Color(0xFFf1f1f1), // Light grey background
         padding: EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Form(
@@ -99,8 +97,8 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12.0),
-                    child:
-                        Text('Update Vehicle', style: TextStyle(fontSize: 16)),
+                    child: Text('Update Vehicle',
+                        style: TextStyle(fontSize: 16, color: Colors.white)),
                   ),
                 ),
               ],

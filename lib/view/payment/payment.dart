@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -5,6 +7,9 @@ import 'dart:convert';
 import 'package:khalti_flutter/khalti_flutter.dart';
 
 class KhaltiPaymentScreen extends StatefulWidget {
+  final String amount;
+  const KhaltiPaymentScreen({super.key, required this.amount});
+
   @override
   _KhaltiPaymentScreenState createState() => _KhaltiPaymentScreenState();
 }
@@ -84,14 +89,7 @@ class _KhaltiPaymentScreenState extends State<KhaltiPaymentScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
-              controller: _amountController,
-              decoration: InputDecoration(
-                labelText: "Amount (NPR)",
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-            ),
+            // Text("Amount : ${widget.amount}"),
             SizedBox(height: 16),
             TextField(
               controller: _mobileController,
@@ -103,8 +101,9 @@ class _KhaltiPaymentScreenState extends State<KhaltiPaymentScreen> {
             ),
             SizedBox(height: 16),
             Builder(builder: (context) {
+              int cost = int.parse(widget.amount);
               final config = PaymentConfig(
-                amount: 10000, // Amount should be in paisa
+                amount: 1000,
                 productIdentity: 'dell-g5-g5510-2021',
                 productName: 'Dell G5 G5510 2021',
                 productUrl: 'https://www.khalti.com/#/bazaar',

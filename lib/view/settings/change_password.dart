@@ -1,3 +1,4 @@
+import 'package:electrio/component/customclip_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:electrio/provider/user_provider.dart';
@@ -59,10 +60,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: const Color(0xffF0F4F8), // Grey background
-        appBar: AppBar(
-          title: const Text('Change Password'),
-          backgroundColor: const Color(0xff4CAF50), // Green theme
-        ),
+        appBar: CustomCurvedAppBar(title: "Change Password"),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -146,7 +144,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       textStyle: const TextStyle(fontSize: 16),
                     ),
                     onPressed: _changePassword,
-                    child: const Text('Change Password'),
+                    child: const Text('Change Password',
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ],
               ),

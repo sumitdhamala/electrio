@@ -1,4 +1,5 @@
 import 'package:electrio/component/constants/constants.dart';
+import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -77,10 +78,7 @@ class _UserFeedbacksScreenState extends State<UserFeedbacksScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('My Feedbacks'),
-        backgroundColor: Colors.green,
-      ),
+      appBar: CustomCurvedAppBar(title: "My Feedbacks"),
       body: _isLoading
           ? Center(
               child: CircularProgressIndicator(),

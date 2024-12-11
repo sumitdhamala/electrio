@@ -51,6 +51,17 @@ class MyApp extends StatelessWidget {
           publicKey: "9f74423ecb2f4131aef333d24d65a04e",
           builder: (context, navigatorKey) {
             return MaterialApp(
+              theme: ThemeData(
+                appBarTheme: AppBarTheme(
+                  iconTheme: IconThemeData(color: Colors.white),
+                ),
+                snackBarTheme: SnackBarThemeData(
+                  backgroundColor: Colors.green,
+                  contentTextStyle: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
               debugShowCheckedModeBanner: false,
               navigatorKey: navigatorKey,
               supportedLocales: const [

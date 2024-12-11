@@ -8,6 +8,7 @@ import 'package:electrio/view/settings/myvehicles.dart';
 import 'package:electrio/view/settings/profile_sscreen.dart';
 import 'package:electrio/view/signup/forget_password.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends StatelessWidget {
   @override
@@ -147,8 +148,18 @@ class SettingsScreen extends StatelessWidget {
             child: Text('Cancel', style: TextStyle(color: Colors.green)),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/login');
+            onPressed: () async {
+              // Clear token
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.remove('token');
+
+              Navigator.of(context).pop();
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/login',
+                (route) => false,
+              );
+
               print('Logged out');
             },
             child: Text(

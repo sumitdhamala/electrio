@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'package:electrio/component/constants/constants.dart';
 import 'package:electrio/view/home/map.dart';
 import 'package:electrio/view/home/reservation/reservation_screen.dart';
+import 'package:electrio/view/home/station/station_feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:electrio/model/station_model.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class StationDetailSheet extends StatelessWidget {
@@ -32,10 +34,59 @@ class StationDetailSheet extends StatelessWidget {
     }
   }
 
+  Future<List<StationFeedback>> _fetchStationFeedbacks(int stationId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final response = await http.get(
+        Uri.parse("$url/feedbacks/feedback/stations/$stationId/"),
+        headers: {
+          "Authorization": "Token $token ",
+          "Content-Type": "application/json",
+        },
+      );
+
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final List<dynamic> feedbackList = jsonDecode(response.body);
+
+        return feedbackList
+            .map((feedback) => StationFeedback(
+                  username: feedback['user_name'],
+                  rating: feedback['rating'],
+                  feedback: feedback['feedback'],
+                ))
+            .toList();
+      } else {
+        print('Server error: ${response.statusCode}');
+        throw Exception('Failed to load feedbacks');
+      }
+    } catch (e) {
+      print('Error fetching feedbacks: $e');
+      throw Exception('Error fetching feedbacks: $e');
+    }
+  }
+
+  Future<double> _calculateAverageRating(int stationId) async {
+    try {
+      List<StationFeedback> feedbacks = await _fetchStationFeedbacks(stationId);
+      if (feedbacks.isEmpty) return 0.0;
+
+      double totalRating =
+          feedbacks.fold(0.0, (sum, feedback) => sum + feedback.rating);
+      return totalRating / feedbacks.length;
+    } catch (e) {
+      print('Error calculating average rating: $e');
+      return 0.0;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Station>(
-      future: _fetchStationDetails(station.id), // Pass station ID dynamically
+      future: _fetchStationDetails(station.id),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -54,12 +105,47 @@ class StationDetailSheet extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    station.name,
-                    style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black),
+                  FutureBuilder<double>(
+                    future: _calculateAverageRating(station.id),
+                    builder: (context, avgSnapshot) {
+                      if (avgSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return Text(
+                          station.name,
+                          style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        );
+                      }
+
+                      double averageRating = avgSnapshot.data ?? 0.0;
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            station.name,
+                            style: TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                          Row(
+                            children: [
+                              Icon(Icons.star, color: Colors.green, size: 20),
+                              SizedBox(width: 5),
+                              Text(
+                                averageRating.toStringAsFixed(1),
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    },
                   ),
                   SizedBox(height: 10),
                   Row(
@@ -119,6 +205,40 @@ class StationDetailSheet extends StatelessWidget {
                   _buildFacilities(station),
                   SizedBox(height: 20),
                   _buildActionButtons(context),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () async {
+                      try {
+                        List<StationFeedback> feedbacks =
+                            await _fetchStationFeedbacks(station.id);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => StationFeedbacksScreen(
+                              stationName: station.name,
+                              feedbacks: feedbacks,
+                            ),
+                          ),
+                        );
+                      } catch (e) {
+                        print('Error fetching feedbacks: $e');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Error loading feedbacks!'),
+                          ),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    ),
+                    child: Text(
+                      'View Feedbacks',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -180,7 +300,7 @@ class StationDetailSheet extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (context) => HomeView(
-          fallbackRouteDestination: destination, 
+          fallbackRouteDestination: destination,
         ),
       ),
     );
@@ -263,4 +383,16 @@ class StationDetailSheet extends StatelessWidget {
       ),
     );
   }
+}
+
+class StationFeedback {
+  final String username;
+  final double rating;
+  final String feedback;
+
+  StationFeedback({
+    required this.username,
+    required this.rating,
+    required this.feedback,
+  });
 }

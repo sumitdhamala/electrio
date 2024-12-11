@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,9 +12,21 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 5), () {
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+
+    // Simulate a delay for the splash screen
+    await Future.delayed(const Duration(seconds: 5));
+
+    if (token != null && token.isNotEmpty) {
+      Navigator.pushReplacementNamed(context, '/home');
+    } else {
       Navigator.pushReplacementNamed(context, '/login');
-    });
+    }
   }
 
   @override
@@ -25,13 +38,9 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Add your logo here
-            // Image.asset(
-            //   'assets/images/Screenshot.png',
-            //   height: 150,
-            // ),
             Icon(Icons.electric_bolt, size: 80, color: Colors.green),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               "Electrio",
               style: TextStyle(
                 fontSize: 24,
@@ -39,8 +48,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 color: Colors.black,
               ),
             ),
-            SizedBox(height: 20),
-            CircularProgressIndicator(
+            const SizedBox(height: 20),
+            const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
             ),
           ],

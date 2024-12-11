@@ -30,9 +30,14 @@ class _StationsScreenState extends State<StationsScreen> {
 
   Future<Position?> _getUserLocation() async {
     try {
-      return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+      // Define the location settings with desired accuracy
+      LocationSettings locationSettings = LocationSettings(
+        accuracy: LocationAccuracy.high, // High accuracy location
+        distanceFilter: 0, // Get location updates for every movement
       );
+
+      return await Geolocator.getCurrentPosition(
+          locationSettings: locationSettings);
     } catch (e) {
       print('Error getting user location: $e');
       return null;

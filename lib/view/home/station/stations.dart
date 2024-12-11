@@ -16,8 +16,10 @@ class StationsScreen extends StatefulWidget {
 
 class _StationsScreenState extends State<StationsScreen> {
   List<Station> stations = [];
+  List<Station> filteredStations = [];
   bool isLoading = true;
   String errorMessage = '';
+  String searchQuery = '';
   Position? userLocation;
 
   @override
@@ -84,6 +86,7 @@ class _StationsScreenState extends State<StationsScreen> {
 
         setState(() {
           stations = fetchedStations;
+          filteredStations = fetchedStations;
           isLoading = false;
         });
       } else {
@@ -100,6 +103,17 @@ class _StationsScreenState extends State<StationsScreen> {
     }
   }
 
+  void _filterStations(String query) {
+    final filtered = stations
+        .where((station) =>
+            station.name.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+    setState(() {
+      searchQuery = query;
+      filteredStations = filtered;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,27 +121,46 @@ class _StationsScreenState extends State<StationsScreen> {
         title: 'Stations',
         backgroundColor: Colors.green,
       ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : errorMessage.isNotEmpty
-              ? Center(child: Text(errorMessage))
-              : ListView.builder(
-                  padding: const EdgeInsets.all(8.0),
-                  itemCount: stations.length,
-                  itemBuilder: (context, index) {
-                    final station = stations[index];
-                    return GestureDetector(
-                      onTap: () => _showStationDetails(context, station),
-                      child: CustomStationTile(
-                        icon: Icons.ev_station_outlined,
-                        title: station.name,
-                        subtitle: station.location,
-                        distance: station.distance,
-                        status: station.status,
-                      ),
-                    );
-                  },
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              onChanged: _filterStations,
+              decoration: InputDecoration(
+                prefixIcon: Icon(Icons.search),
+                hintText: 'Search by station name...',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: isLoading
+                ? Center(child: CircularProgressIndicator())
+                : errorMessage.isNotEmpty
+                    ? Center(child: Text(errorMessage))
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(8.0),
+                        itemCount: filteredStations.length,
+                        itemBuilder: (context, index) {
+                          final station = filteredStations[index];
+                          return GestureDetector(
+                            onTap: () => _showStationDetails(context, station),
+                            child: CustomStationTile(
+                              icon: Icons.ev_station_outlined,
+                              title: station.name,
+                              subtitle: station.location,
+                              distance: station.distance,
+                              status: station.status,
+                            ),
+                          );
+                        },
+                      ),
+          ),
+        ],
+      ),
     );
   }
 

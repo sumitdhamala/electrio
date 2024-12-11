@@ -3,7 +3,6 @@ import 'package:electrio/provider/booking_provider.dart';
 import 'package:electrio/provider/reservationprovider.dart';
 import 'package:electrio/provider/user_provider.dart';
 import 'package:electrio/provider/vehicle_provider.dart';
-import 'package:electrio/view/payment/payment.dart';
 import 'package:electrio/view/settings/profile_sscreen.dart';
 import 'package:electrio/view/signup/forget_password.dart';
 import 'package:electrio/view/home_screen.dart';
@@ -12,7 +11,6 @@ import 'package:electrio/view/signup/signup.dart';
 import 'package:electrio/view/signup/vehicle_registration.dart';
 import 'package:electrio/view/splash_screen.dart';
 import 'package:khalti_flutter/khalti_flutter.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

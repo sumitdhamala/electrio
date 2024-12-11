@@ -8,7 +8,6 @@ import 'package:electrio/model/station_model.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class StationDetailSheet extends StatelessWidget {
@@ -131,7 +130,6 @@ class StationDetailSheet extends StatelessWidget {
     );
   }
 
-  /// Map status codes to human-readable text
   String _getStatusText(String status) {
     switch (status) {
       case 'OP':
@@ -182,7 +180,7 @@ class StationDetailSheet extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (context) => HomeView(
-          fallbackRouteDestination: destination, // Pass the destination
+          fallbackRouteDestination: destination, 
         ),
       ),
     );

@@ -150,98 +150,100 @@ class _HomeViewState extends State<HomeView> {
             .join(", ")
         : "N/A";
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          station['station_name'],
-          style: TextStyle(
-              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
-        ),
-        SizedBox(height: 8),
-        Text(
-          'Location: ${station['station_location']}',
-          style: TextStyle(color: Colors.grey),
-        ),
-        SizedBox(height: 8),
-        Row(
-          children: [
-            Chip(
-              label: Text('Slots: ${station['total_slots']}'),
-              backgroundColor: Colors.green.shade100,
-              avatar: Icon(Icons.battery_charging_full, size: 16),
-            ),
-            SizedBox(width: 8),
-            Chip(
-              label: Text('Types: $chargerTypes'),
-              backgroundColor: Colors.green.shade100,
-              avatar: Icon(Icons.power, size: 16),
-            ),
-          ],
-        ),
-        SizedBox(height: 8),
-        Wrap(
-          spacing: 8.0,
-          children: [
-            if (station['has_wifi'])
-              Chip(
-                label: Text('Wi-Fi'),
-                avatar: Icon(Icons.wifi, size: 16),
-                backgroundColor: Colors.green.shade100,
-              ),
-            if (station['has_parking'])
-              Chip(
-                label: Text('Parking'),
-                avatar: Icon(Icons.local_parking, size: 16),
-                backgroundColor: Colors.green.shade100,
-              ),
-            if (station['has_restrooms'])
-              Chip(
-                label: Text('Restrooms'),
-                avatar: Icon(Icons.wc, size: 16),
-                backgroundColor: Colors.green.shade100,
-              ),
-            if (station['has_restaurants'])
-              Chip(
-                label: Text('Restaurant'),
-                avatar: Icon(Icons.restaurant, size: 16),
-                backgroundColor: Colors.green.shade100,
-              ),
-          ],
-        ),
-        SizedBox(height: 8),
-        ElevatedButton.icon(
-          onPressed: () {
-            final destination = LatLng(
-              double.parse(station['station_latitude']),
-              double.parse(station['station_longitude']),
-            );
-            _getRouteToStation(destination);
-
-            setState(() {
-              _selectedStationLocation = null;
-            });
-          },
-          icon: Icon(Icons.directions),
-          label: Text('Get Directions'),
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-        ),
-        if (_routeSummary != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Text('Route: $_routeSummary',
-                style: TextStyle(color: Colors.grey)),
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            station['station_name'],
+            style: TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
           ),
-        SizedBox(height: 8),
-        TextButton(
-          onPressed: () {
-            setState(() {
-              _selectedStationLocation = null; // Dismiss the popup
-            });
-          },
-          child: Text('Cancel', style: TextStyle(color: Colors.red)),
-        ),
-      ],
+          SizedBox(height: 8),
+          Text(
+            'Location: ${station['station_location']}',
+            style: TextStyle(color: Colors.grey),
+          ),
+          SizedBox(height: 8),
+          Row(
+            children: [
+              Chip(
+                label: Text('Slots: ${station['total_slots']}'),
+                backgroundColor: Colors.green.shade100,
+                avatar: Icon(Icons.battery_charging_full, size: 16),
+              ),
+              SizedBox(width: 8),
+              Chip(
+                label: Text(' $chargerTypes'),
+                backgroundColor: Colors.green.shade100,
+                avatar: Icon(Icons.power, size: 16),
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Wrap(
+            spacing: 8.0,
+            children: [
+              if (station['has_wifi'])
+                Chip(
+                  label: Text('Wi-Fi'),
+                  avatar: Icon(Icons.wifi, size: 16),
+                  backgroundColor: Colors.green.shade100,
+                ),
+              if (station['has_parking'])
+                Chip(
+                  label: Text('Parking'),
+                  avatar: Icon(Icons.local_parking, size: 16),
+                  backgroundColor: Colors.green.shade100,
+                ),
+              if (station['has_restrooms'])
+                Chip(
+                  label: Text('Restrooms'),
+                  avatar: Icon(Icons.wc, size: 16),
+                  backgroundColor: Colors.green.shade100,
+                ),
+              if (station['has_restaurants'])
+                Chip(
+                  label: Text('Restaurant'),
+                  avatar: Icon(Icons.restaurant, size: 16),
+                  backgroundColor: Colors.green.shade100,
+                ),
+            ],
+          ),
+          SizedBox(height: 6),
+          ElevatedButton.icon(
+            onPressed: () {
+              final destination = LatLng(
+                double.parse(station['station_latitude']),
+                double.parse(station['station_longitude']),
+              );
+              _getRouteToStation(destination);
+
+              setState(() {
+                _selectedStationLocation = null;
+              });
+            },
+            icon: Icon(Icons.directions),
+            label: Text('Get Directions'),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+          ),
+          // if (_routeSummary != null)
+          //   Padding(
+          //     padding: const EdgeInsets.only(top: 8.0),
+          //     child: Text('Route: $_routeSummary',
+          //         style: TextStyle(color: Colors.grey)),
+          //   ),
+          SizedBox(height: 8),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _selectedStationLocation = null; // Dismiss the popup
+              });
+            },
+            child: Text('Cancel', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
     );
   }
 

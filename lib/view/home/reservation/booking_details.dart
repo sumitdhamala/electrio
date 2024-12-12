@@ -194,9 +194,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => KhaltiPaymentScreen(
-                                        amount: bookingDetails!['total_cost']
-                                      )));
+                                  builder: (context) => KhaltiPaymentScreen()));
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                                 content: Text('Navigate to payment screen.')),

@@ -6,8 +6,8 @@ import 'dart:convert';
 import 'package:khalti_flutter/khalti_flutter.dart';
 
 class KhaltiPaymentScreen extends StatefulWidget {
-  final String amount;
-  const KhaltiPaymentScreen({super.key, required this.amount});
+  // final String amount;
+  const KhaltiPaymentScreen({super.key, });
 
   @override
   _KhaltiPaymentScreenState createState() => _KhaltiPaymentScreenState();
@@ -100,7 +100,6 @@ class _KhaltiPaymentScreenState extends State<KhaltiPaymentScreen> {
             ),
             SizedBox(height: 16),
             Builder(builder: (context) {
-              int cost = int.parse(widget.amount);
               final config = PaymentConfig(
                 amount: 1000,
                 productIdentity: 'dell-g5-g5510-2021',

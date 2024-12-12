@@ -159,7 +159,7 @@ class _HomeViewState extends State<HomeView> {
             style: TextStyle(
                 fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
           ),
-          SizedBox(height: 8),
+          SizedBox(height: 5),
           Text(
             'Location: ${station['station_location']}',
             style: TextStyle(color: Colors.grey),
@@ -210,7 +210,7 @@ class _HomeViewState extends State<HomeView> {
                 ),
             ],
           ),
-          SizedBox(height: 6),
+          SizedBox(height: 4),
           ElevatedButton.icon(
             onPressed: () {
               final destination = LatLng(
@@ -227,13 +227,12 @@ class _HomeViewState extends State<HomeView> {
             label: Text('Get Directions'),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
           ),
-          // if (_routeSummary != null)
-          //   Padding(
-          //     padding: const EdgeInsets.only(top: 8.0),
-          //     child: Text('Route: $_routeSummary',
-          //         style: TextStyle(color: Colors.grey)),
-          //   ),
-          SizedBox(height: 8),
+          if (_routeSummary != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 1.0),
+              child: Text('Route: $_routeSummary',
+                  style: TextStyle(color: Colors.grey)),
+            ),
           TextButton(
             onPressed: () {
               setState(() {

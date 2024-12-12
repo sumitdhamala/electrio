@@ -222,7 +222,6 @@ class HistoryTile extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                             builder: (context) => KhaltiPaymentScreen(
-                                  amount: booking['price'],
                                 )));
                   },
                   style: ElevatedButton.styleFrom(

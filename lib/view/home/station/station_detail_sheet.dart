@@ -12,11 +12,17 @@ import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-class StationDetailSheet extends StatelessWidget {
+class StationDetailSheet extends StatefulWidget {
   final Station station;
 
-  StationDetailSheet({required this.station});
+  const StationDetailSheet({super.key, required this.station});
 
+  @override
+  State<StationDetailSheet> createState() => _StationDetailSheetState();
+ 
+}
+
+class _StationDetailSheetState extends State<StationDetailSheet> {
   Future<Station> _fetchStationDetails(int stationId) async {
     try {
       final response =
@@ -86,7 +92,7 @@ class StationDetailSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Station>(
-      future: _fetchStationDetails(station.id),
+      future: _fetchStationDetails(widget.station.id),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -336,9 +342,9 @@ class StationDetailSheet extends StatelessWidget {
 
                 final userLatitude = position.latitude;
                 final userLongitude = position.longitude;
-                final destinationLatitude = double.parse("${station.latitude}");
+                final destinationLatitude = double.parse("${widget.station.latitude}");
                 final destinationLongitude =
-                    double.parse("${station.longitude}");
+                    double.parse("${widget.station.longitude}");
 
                 final googleMapsUrl =
                     "https://www.google.com/maps/dir/?api=1&origin=$userLatitude,$userLongitude&destination=$destinationLatitude,$destinationLongitude&travelmode=driving";
@@ -350,7 +356,7 @@ class StationDetailSheet extends StatelessWidget {
                 }
               } catch (e) {
                 print('Error launching Google Maps: $e');
-                _redirectToAppMapPage(context, station);
+                _redirectToAppMapPage(context, widget.station);
               }
             },
             style: ElevatedButton.styleFrom(
@@ -368,7 +374,7 @@ class StationDetailSheet extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          ReservationScreen(station: station)));
+                          ReservationScreen(station: widget.station)));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,

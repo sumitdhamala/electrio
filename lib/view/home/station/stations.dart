@@ -7,6 +7,7 @@ import 'package:electrio/component/custom_station_tile.dart';
 import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/model/station_model.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'station_detail_sheet.dart';
 
 class StationsScreen extends StatefulWidget {
@@ -17,15 +18,28 @@ class StationsScreen extends StatefulWidget {
 class _StationsScreenState extends State<StationsScreen> {
   List<Station> stations = [];
   List<Station> filteredStations = [];
+  List<String> notifications = []; // Store notifications
   bool isLoading = true;
   String errorMessage = '';
   String searchQuery = '';
   Position? userLocation;
 
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
   @override
   void initState() {
     super.initState();
+    _initializeNotifications();
     _fetchStations();
+  }
+
+  Future<void> _initializeNotifications() async {
+    const AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings('app_icon'); // Add your app icon
+    const InitializationSettings settings =
+        InitializationSettings(android: androidSettings);
+    await flutterLocalNotificationsPlugin.initialize(settings);
   }
 
   Future<Position?> _getUserLocation() async {
@@ -58,6 +72,32 @@ class _StationsScreenState extends State<StationsScreen> {
     return earthRadius * c * 1.2;
   }
 
+  Future<void> _showNearbyNotification(List<Station> nearbyStations) async {
+    final notificationTitle = "Nearby Charging Stations";
+    final notificationBody =
+        "Found ${nearbyStations.length} station(s) within 5km.";
+    notifications.add(notificationBody); // Store notification
+
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+      'nearby_stations_channel',
+      'Nearby Stations',
+      channelDescription: 'Notifications for nearby charging stations',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+
+    const NotificationDetails platformDetails =
+        NotificationDetails(android: androidDetails);
+
+    await flutterLocalNotificationsPlugin.show(
+      0, // Notification ID
+      notificationTitle,
+      notificationBody,
+      platformDetails,
+    );
+  }
+
   Future<void> _fetchStations() async {
     try {
       userLocation = await _getUserLocation();
@@ -72,6 +112,8 @@ class _StationsScreenState extends State<StationsScreen> {
         List<Station> fetchedStations =
             stationList.map((data) => Station.fromJson(data)).toList();
 
+        List<Station> nearbyStations = [];
+
         if (userLocation != null) {
           for (var station in fetchedStations) {
             if (station.latitude != null && station.longitude != null) {
@@ -81,11 +123,19 @@ class _StationsScreenState extends State<StationsScreen> {
                 station.latitude!,
                 station.longitude!,
               );
+
+              if (station.distance! <= 5) {
+                nearbyStations.add(station);
+              }
             } else {
               station.distance = double.infinity;
             }
           }
           fetchedStations.sort((a, b) => a.distance!.compareTo(b.distance!));
+        }
+
+        if (nearbyStations.isNotEmpty) {
+          _showNearbyNotification(nearbyStations);
         }
 
         setState(() {

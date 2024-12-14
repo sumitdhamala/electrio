@@ -11,11 +11,23 @@ import 'package:electrio/view/signup/signup.dart';
 import 'package:electrio/view/signup/vehicle_registration.dart';
 import 'package:electrio/view/splash_screen.dart';
 import 'package:khalti_flutter/khalti_flutter.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('app_icon'); // Add your app icon here
+
+  const InitializationSettings initializationSettings =
+      InitializationSettings(android: initializationSettingsAndroid);
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
   final authProvider = AuthProvider();
   await authProvider.loadToken();

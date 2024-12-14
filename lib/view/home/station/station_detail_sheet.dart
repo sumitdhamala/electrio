@@ -43,6 +43,7 @@ class _StationDetailSheetState extends State<StationDetailSheet> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
+
       if (token == null) {
         throw Exception('Authorization token is missing');
       }
@@ -61,20 +62,25 @@ class _StationDetailSheetState extends State<StationDetailSheet> {
 
       if (response.statusCode == 200) {
         final List<dynamic> feedbackList = jsonDecode(response.body);
-        return feedbackList
-            .map((feedback) => StationFeedback(
-                  username: feedback['user_name'],
-                  rating: feedback['rating'],
-                  feedback: feedback['feedback'],
-                ))
-            .toList();
+        return feedbackList.map((feedback) {
+          try {
+            return StationFeedback(
+              username: feedback['user_name'],
+              rating: feedback['rating'].toDouble(),
+              feedback: feedback['feedback'],
+            );
+          } catch (e) {
+            print("Error parsing feedback item: $feedback");
+            throw e;
+          }
+        }).toList();
       } else {
         print('Server error: ${response.body}');
         throw Exception('Failed to load feedbacks');
       }
     } catch (e) {
-      print('Error fetching feedbacks: $e');
-      throw Exception('Error fetching feedbacks: $e');
+      print('Error fetching feedbacks: ${e.toString()}');
+      throw Exception('Error fetching feedbacks: ${e.toString()}');
     }
   }
 
@@ -215,37 +221,40 @@ class _StationDetailSheetState extends State<StationDetailSheet> {
                   SizedBox(height: 20),
                   _buildActionButtons(context),
                   SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        List<StationFeedback> feedbacks =
-                            await _fetchStationFeedbacks(station.id);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => StationFeedbacksScreen(
-                              stationName: station.name,
-                              feedbacks: feedbacks,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        try {
+                          List<StationFeedback> feedbacks =
+                              await _fetchStationFeedbacks(station.id);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => StationFeedbacksScreen(
+                                stationName: station.name,
+                                feedbacks: feedbacks,
+                              ),
                             ),
-                          ),
-                        );
-                      } catch (e) {
-                        print('Error fetching feedbacks: $e');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Error loading feedbacks!'),
-                          ),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    ),
-                    child: Text(
-                      'View Feedbacks',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
+                          );
+                        } catch (e) {
+                          print('Error fetching feedbacks: $e');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error loading feedbacks!'),
+                            ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      ),
+                      child: Text(
+                        'Feedbacks',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
                     ),
                   ),
                 ],
@@ -331,8 +340,8 @@ class _StationDetailSheetState extends State<StationDetailSheet> {
 
   Widget _buildActionButtons(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      color: Colors.grey[200],
+      padding: EdgeInsets.symmetric(horizontal: 12),
+      // color: Colors.grey[200],
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

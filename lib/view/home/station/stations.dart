@@ -30,10 +30,9 @@ class _StationsScreenState extends State<StationsScreen> {
 
   Future<Position?> _getUserLocation() async {
     try {
-      // Define the location settings with desired accuracy
       LocationSettings locationSettings = LocationSettings(
-        accuracy: LocationAccuracy.high, // High accuracy location
-        distanceFilter: 0, // Get location updates for every movement
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 0,
       );
 
       return await Geolocator.getCurrentPosition(
@@ -46,7 +45,7 @@ class _StationsScreenState extends State<StationsScreen> {
 
   double _calculateDistance(
       double lat1, double lon1, double lat2, double lon2) {
-    const double earthRadius = 6371; // Radius of Earth in kilometers
+    const double earthRadius = 6371;
     double dLat = (lat2 - lat1) * (pi / 180);
     double dLon = (lon2 - lon1) * (pi / 180);
 
@@ -172,11 +171,25 @@ class _StationsScreenState extends State<StationsScreen> {
   void _showStationDetails(BuildContext context, Station station) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => StationDetailSheet(station: station),
+      builder: (context) {
+        return FractionallySizedBox(
+          heightFactor: 0.8,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: SingleChildScrollView(
+              child: StationDetailSheet(station: station),
+            ),
+          ),
+        );
+      },
     );
   }
 }

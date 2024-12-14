@@ -56,7 +56,7 @@ class _StationsScreenState extends State<StationsScreen> {
             sin(dLon / 2) *
             sin(dLon / 2);
     double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    return earthRadius * c;
+    return earthRadius * c * 1.2;
   }
 
   Future<void> _fetchStations() async {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 const primarycolor = Color(0xFF4CAF50);
 Color backgroundcolor = const Color.fromARGB(255, 165, 163, 163);
-const url = "http://10.32.17.145:8000";
+const url = "http://192.168.100.15:8000";
 const mblurl = "http://192.168.100.8:8000";
 //192.168.100.15
 //10.0.2.2

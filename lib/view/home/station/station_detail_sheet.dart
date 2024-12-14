@@ -19,7 +19,6 @@ class StationDetailSheet extends StatefulWidget {
 
   @override
   State<StationDetailSheet> createState() => _StationDetailSheetState();
- 
 }
 
 class _StationDetailSheetState extends State<StationDetailSheet> {
@@ -44,20 +43,24 @@ class _StationDetailSheetState extends State<StationDetailSheet> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
+      if (token == null) {
+        throw Exception('Authorization token is missing');
+      }
+
       final response = await http.get(
         Uri.parse("$url/feedbacks/feedback/stations/$stationId/"),
         headers: {
-          "Authorization": "Token $token ",
+          "Authorization": "Token $token",
           "Content-Type": "application/json",
         },
       );
 
+      print("Fetching feedbacks for station $stationId");
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         final List<dynamic> feedbackList = jsonDecode(response.body);
-
         return feedbackList
             .map((feedback) => StationFeedback(
                   username: feedback['user_name'],
@@ -66,7 +69,7 @@ class _StationDetailSheetState extends State<StationDetailSheet> {
                 ))
             .toList();
       } else {
-        print('Server error: ${response.statusCode}');
+        print('Server error: ${response.body}');
         throw Exception('Failed to load feedbacks');
       }
     } catch (e) {
@@ -342,7 +345,8 @@ class _StationDetailSheetState extends State<StationDetailSheet> {
 
                 final userLatitude = position.latitude;
                 final userLongitude = position.longitude;
-                final destinationLatitude = double.parse("${widget.station.latitude}");
+                final destinationLatitude =
+                    double.parse("${widget.station.latitude}");
                 final destinationLongitude =
                     double.parse("${widget.station.longitude}");
 

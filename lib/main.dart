@@ -11,26 +11,16 @@ import 'package:electrio/view/signup/signup.dart';
 import 'package:electrio/view/signup/vehicle_registration.dart';
 import 'package:electrio/view/splash_screen.dart';
 import 'package:khalti_flutter/khalti_flutter.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+import 'package:overlay_support/overlay_support.dart'; // Import overlay_support package
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('app_icon'); // Add your app icon here
-
-  const InitializationSettings initializationSettings =
-      InitializationSettings(android: initializationSettingsAndroid);
-
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-
   final authProvider = AuthProvider();
   await authProvider.loadToken();
+
   runApp(const MyApp());
 }
 
@@ -39,25 +29,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (_) => AuthProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => UserProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => BookingProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => Reservationprovider(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => VehicleProvider(),
-        ),
-      ],
-      child: KhaltiScope(
+    return OverlaySupport.global(
+      // Ensure OverlaySupport.global is wrapping your app
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (_) => AuthProvider(),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => UserProvider(),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => BookingProvider(),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => Reservationprovider(),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => VehicleProvider(),
+          ),
+        ],
+        child: KhaltiScope(
           publicKey: "9f74423ecb2f4131aef333d24d65a04e",
           builder: (context, navigatorKey) {
             return MaterialApp(
@@ -91,7 +83,9 @@ class MyApp extends StatelessWidget {
                 '/vehicleRegistration': (context) => VehicleRegistrationPage(),
               },
             );
-          }),
+          },
+        ),
+      ),
     );
   }
 }

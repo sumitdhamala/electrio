@@ -1,4 +1,5 @@
 import 'package:electrio/component/constants/constants.dart';
+import 'package:electrio/view/settings/profile_sscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -250,6 +251,25 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+          actions: [
+            Padding(
+              padding: EdgeInsets.all(5),
+              child: Icon(Icons.notifications),
+            )
+          ],
+          leading: InkWell(
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ProfileScreen()));
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: CircleAvatar(
+                radius: 8,
+                backgroundImage: NetworkImage("https://picsum.photos/200/300"),
+              ),
+            ),
+          ),
           centerTitle: true,
           title: Text(
             'Map',

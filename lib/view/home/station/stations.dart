@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -7,10 +8,12 @@ import 'package:electrio/component/custom_station_tile.dart';
 import 'package:electrio/component/customclip_bar.dart';
 import 'package:electrio/model/station_model.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'station_detail_sheet.dart';
+import 'package:electrio/component/notification_manager.dart';
 
 class StationsScreen extends StatefulWidget {
+  const StationsScreen({super.key});
+
   @override
   _StationsScreenState createState() => _StationsScreenState();
 }
@@ -18,28 +21,31 @@ class StationsScreen extends StatefulWidget {
 class _StationsScreenState extends State<StationsScreen> {
   List<Station> stations = [];
   List<Station> filteredStations = [];
-  List<String> notifications = []; // Store notifications
   bool isLoading = true;
   String errorMessage = '';
   String searchQuery = '';
   Position? userLocation;
 
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  Timer? stationCheckTimer;
 
   @override
   void initState() {
     super.initState();
-    _initializeNotifications();
     _fetchStations();
+    _startStationCheck();
   }
 
-  Future<void> _initializeNotifications() async {
-    const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('app_icon'); // Add your app icon
-    const InitializationSettings settings =
-        InitializationSettings(android: androidSettings);
-    await flutterLocalNotificationsPlugin.initialize(settings);
+  @override
+  void dispose() {
+    stationCheckTimer?.cancel();
+    super.dispose();
+  }
+
+  // Start checking for nearby stations every 5 minutes
+  void _startStationCheck() {
+    stationCheckTimer = Timer.periodic(Duration(seconds: 100), (timer) {
+      _fetchStations(); // Check nearby stations and send notifications
+    });
   }
 
   Future<Position?> _getUserLocation() async {
@@ -69,33 +75,19 @@ class _StationsScreenState extends State<StationsScreen> {
             sin(dLon / 2) *
             sin(dLon / 2);
     double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    return earthRadius * c * 1.2;
+    return earthRadius * c;
   }
 
+  // Show notifications if there are nearby stations
   Future<void> _showNearbyNotification(List<Station> nearbyStations) async {
-    final notificationTitle = "Nearby Charging Stations";
-    final notificationBody =
-        "Found ${nearbyStations.length} station(s) within 5km.";
-    notifications.add(notificationBody); // Store notification
+    for (var station in nearbyStations) {
+      String title = "Nearby Charging Station Found";
+      String message =
+          "A charging station named ${station.name} is ${station.distance!.toStringAsFixed(2)} km away from your location.";
 
-    const AndroidNotificationDetails androidDetails =
-        AndroidNotificationDetails(
-      'nearby_stations_channel',
-      'Nearby Stations',
-      channelDescription: 'Notifications for nearby charging stations',
-      importance: Importance.high,
-      priority: Priority.high,
-    );
-
-    const NotificationDetails platformDetails =
-        NotificationDetails(android: androidDetails);
-
-    await flutterLocalNotificationsPlugin.show(
-      0, // Notification ID
-      notificationTitle,
-      notificationBody,
-      platformDetails,
-    );
+      // Add notification to NotificationManager
+      NotificationManager.addNotification(title, message);
+    }
   }
 
   Future<void> _fetchStations() async {
@@ -124,16 +116,16 @@ class _StationsScreenState extends State<StationsScreen> {
                 station.longitude!,
               );
 
+              // If the station is within 5 km
               if (station.distance! <= 5) {
                 nearbyStations.add(station);
               }
-            } else {
-              station.distance = double.infinity;
             }
           }
           fetchedStations.sort((a, b) => a.distance!.compareTo(b.distance!));
         }
 
+        // Show notification for nearby stations
         if (nearbyStations.isNotEmpty) {
           _showNearbyNotification(nearbyStations);
         }
@@ -172,6 +164,10 @@ class _StationsScreenState extends State<StationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomCurvedAppBar(
+        notifications: NotificationManager.getNotifications()
+            .map((n) => n['title']!)
+            .toList(),
+        imgurl: "https://picsum.photos/200/300",
         title: 'Stations',
         backgroundColor: Colors.green,
       ),

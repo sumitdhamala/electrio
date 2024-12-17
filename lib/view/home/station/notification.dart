@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
 
-class NotificationScreen extends StatelessWidget {
+class NotificationScreen extends StatefulWidget {
   final List<Map<String, String>> notifications;
 
   NotificationScreen({super.key, required this.notifications});
+
+  @override
+  _NotificationScreenState createState() => _NotificationScreenState();
+}
+
+class _NotificationScreenState extends State<NotificationScreen> {
+  // Method to delete a notification by index
+  void deleteNotification(int index) {
+    setState(() {
+      widget.notifications
+          .removeAt(index); // Remove the notification at the given index
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,12 +25,12 @@ class NotificationScreen extends StatelessWidget {
         title: const Text('Notifications'),
         backgroundColor: Colors.green,
       ),
-      body: notifications.isEmpty
+      body: widget.notifications.isEmpty
           ? const Center(child: Text('No notifications available.'))
           : ListView.builder(
-              itemCount: notifications.length,
+              itemCount: widget.notifications.length,
               itemBuilder: (context, index) {
-                var notification = notifications[index];
+                var notification = widget.notifications[index];
                 return Card(
                   margin:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -53,7 +66,7 @@ class NotificationScreen extends StatelessWidget {
                         color: Colors.red,
                       ),
                       onPressed: () {
-                        // Handle dismiss action here, if required
+                        deleteNotification(index);
                       },
                     ),
                   ),
